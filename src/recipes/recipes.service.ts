@@ -76,6 +76,14 @@ export class RecipesService {
   }
 
   /**
+   * obtener las ultimas 10 recetas agregadas
+   * @returns Lista de las ultimas 10 recetas
+   */
+  async getLatestRecipes() {
+    return await this.RecipeEntity.find().limit(10).sort({ createdAt: -1 });
+  }
+
+  /**
    * Servicio para buscar receta por nombre
    * @param name - Nombre de la receta que desea buscar
    * @returns Lista de recetas que tengan el nombre buscado
