@@ -33,6 +33,6 @@ async function bootstrap() {
   );
   const configService = app.get(ConfigService);
   console.log(configService.get('API_KEY'));
-  await app.listen(process.env.PORT || 8080);
+  await app.listen(parseInt(process.env.PORT) || 8080);
 }
 bootstrap();
