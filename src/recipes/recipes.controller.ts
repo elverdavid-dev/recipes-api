@@ -32,6 +32,11 @@ export class RecipesController {
     return this.recipesService.findAll(page, limit);
   }
 
+  @Get('/latest')
+  getLatestRecipes() {
+    return this.recipesService.getLatestRecipes();
+  }
+
   @Get('/search')
   searchByName(@Query() searchRecipeDto: SearchRecipeDto) {
     return this.recipesService.searchByName(searchRecipeDto);
