@@ -26,7 +26,7 @@ Antes de ejecutar la API, asegúrate de configurar las siguientes variables de e
 
 ## Documentación
 
-La documentación completa de la API está disponible en [www.recipesapi.com/docs](https://www.recipesapi.site/docs). Aquí encontrarás detalles sobre los puntos finales, cómo realizar solicitudes y cómo interpretar las respuestas.
+La documentación completa de la API está disponible en [https://recipes-api-r43i.onrender.com/docs](https://recipes-api-r43i.onrender.com/docs). Aquí encontrarás detalles sobre los puntos finales, cómo realizar solicitudes y cómo interpretar las respuestas.
 
 
 ---
