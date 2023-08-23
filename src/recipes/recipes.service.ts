@@ -44,7 +44,7 @@ export class RecipesService {
         .sort({ createdAt: -1 });
 
       await this.cacheManager.set(this.cacheKey, recipes);
-      console.log('data from database');
+
       return {
         page,
         totalPages,
@@ -52,7 +52,7 @@ export class RecipesService {
         data: recipes,
       };
     }
-    console.log('data from cache');
+
     return cacheData;
   }
 
@@ -71,7 +71,7 @@ export class RecipesService {
     if (!recipe) {
       throw new HttpException('La receta no existe!', HttpStatus.NOT_FOUND);
     }
-    console.log(this.cacheKey);
+
     return recipe;
   }
 

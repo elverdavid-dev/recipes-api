@@ -28,10 +28,10 @@ export class CategoriesService {
         .select('-public_id')
         .sort({ createdAt: -1 });
       await this.cacheManager.set(this.cacheKey, categories);
-      console.log('cache from database');
+
       return categories;
     }
-    console.log('data from cache');
+
     return cacheData;
   }
 

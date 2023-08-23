@@ -10,10 +10,10 @@ export class Recipe {
   description: string;
 
   @Prop({ type: [String], required: true, lowercase: true })
-  steps: string[];
+  ingredients: string[];
 
   @Prop({ type: [String], required: true, lowercase: true })
-  ingredients: string[];
+  steps: string[];
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Category' })
   category: Category;
