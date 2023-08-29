@@ -10,7 +10,7 @@ import { CloudinaryConfigProvider } from './utils/cloudinary.config';
   imports: [
     ConfigModule.forRoot({ isGlobal: true, cache: true }),
     MongooseModule.forRoot(process.env.URI_DB),
-    CacheModule.register({ isGlobal: true, ttl: 60000 }),
+    CacheModule.register({ isGlobal: true, ttl: 60000, store: 'memory' }),
     RecipesModule,
     CategoriesModule,
   ],

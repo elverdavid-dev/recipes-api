@@ -17,6 +17,14 @@ export class RecipesService {
   ) {}
 
   private cacheKey = '';
+  private generateCacheKey(page: number, limit: number): string {
+    return `recipes_list_page_${page}_${limit}`;
+  }
+
+  private async deleteCacheByKey(cacheKey: string): Promise<void> {
+    await this.cacheManager.del(cacheKey);
+  }
+
   /**
    * Servicio para obtener todas las recetas
    * @param page - pagina actual
@@ -25,15 +33,19 @@ export class RecipesService {
    * @throws {HttpException} Si la pagina no existe o es menor o igual a 0
    */
   async findAll(page: number, limit: number) {
-    this.cacheKey = `recipes_key_${page}_${limit}`;
+    //Generar cacheKey
+    this.cacheKey = this.generateCacheKey(page, limit);
+    //Obtener las recetas de la cache si existe
     const cacheData = await this.cacheManager.get(this.cacheKey);
-
+    //Obtener el total de recetas agregadas a la DB
     const totalRecipes = await this.RecipeEntity.countDocuments();
+    //Total de paginas
     const totalPages = Math.ceil(totalRecipes / limit);
+    //Si page es menor que uno o mayor que el valor de totalPages entonce error 404
     if (page < 1 || page > totalPages) {
       throw new HttpException('Página no encontrada', HttpStatus.NOT_FOUND);
     }
-
+    //Si no hay datos en cache entoce se agregan
     if (!cacheData) {
       const skip = (page - 1) * limit;
       const recipes = await this.RecipeEntity.find()
@@ -43,7 +55,13 @@ export class RecipesService {
         .select('-public_id')
         .sort({ createdAt: -1 });
 
-      await this.cacheManager.set(this.cacheKey, recipes);
+      const recipePageData = {
+        page,
+        totalPages,
+        totalRecipes,
+        data: recipes,
+      };
+      await this.cacheManager.set(this.cacheKey, recipePageData);
 
       return {
         page,
@@ -68,6 +86,7 @@ export class RecipesService {
       .populate('category', '-public_id')
       .select('-public_id');
 
+    //Si la receta no existe entonces error 404
     if (!recipe) {
       throw new HttpException('La receta no existe!', HttpStatus.NOT_FOUND);
     }
@@ -131,19 +150,21 @@ export class RecipesService {
    */
   async create(createRecipeDto: CreateRecipeDto, image: Express.Multer.File) {
     try {
+      //Eliminar la cache
+      if (this.cacheKey) {
+        await this.deleteCacheByKey(this.cacheKey);
+        this.cacheKey = '';
+      }
+      //subir imagen a cloudinary y eliminarla de la carpeta upload
       const cloudinaryResponse = await uploadImage(image.path, 'recipes');
       await fse.unlink(image.path);
+      //crear la receta y guardarla en la DB
       const newRecipe = new this.RecipeEntity({
         ...createRecipeDto,
         image: cloudinaryResponse.secure_url,
         public_id: cloudinaryResponse.public_id,
       });
       newRecipe.save();
-      if (this.cacheKey) {
-        await this.cacheManager.del(this.cacheKey);
-
-        this.cacheKey = '';
-      }
 
       return {
         message: 'Receta creada correctamente',
@@ -171,11 +192,16 @@ export class RecipesService {
     updateRecipeDto: UpdateRecipeDto,
     image: Express.Multer.File,
   ) {
+    //Si la recetas no existe error 404
     const recipeFound = await this.RecipeEntity.findById(id);
     if (!recipeFound) {
       throw new HttpException('La receta no existe!', HttpStatus.NOT_FOUND);
     }
-
+    //Eliminar cache
+    if (this.cacheKey) {
+      await this.deleteCacheByKey(this.cacheKey);
+      this.cacheKey = '';
+    }
     //actualizar la imagen
     if (image) {
       await deleteImage(recipeFound.public_id);
@@ -184,12 +210,9 @@ export class RecipesService {
       updateRecipeDto.image = newImage.secure_url;
       updateRecipeDto.public_id = newImage.public_id;
     }
-
+    //receta actualizada
     await this.RecipeEntity.findByIdAndUpdate(id, updateRecipeDto);
-    if (this.cacheKey) {
-      await this.cacheManager.del(this.cacheKey);
-      this.cacheKey = '';
-    }
+
     return {
       message: 'Receta actualizada correctamente',
       name: updateRecipeDto.name,
@@ -203,16 +226,19 @@ export class RecipesService {
    * @throws {HttpException} Si la receta no existe.
    */
   async remove(id: string) {
+    //Si la receta no existe error 404
     const recipeFound = await this.RecipeEntity.findById(id);
     if (!recipeFound) {
       throw new HttpException('La receta no existe!', HttpStatus.NOT_FOUND);
     }
-    await deleteImage(recipeFound.public_id);
-    await this.RecipeEntity.findByIdAndDelete(id);
+    //Eliminar cache
     if (this.cacheKey) {
-      await this.cacheManager.del(this.cacheKey);
+      await this.deleteCacheByKey(this.cacheKey);
       this.cacheKey = '';
     }
+    //Eliminar receta y eliminar imagen de cloudinary
+    await deleteImage(recipeFound.public_id);
+    await this.RecipeEntity.findByIdAndDelete(id);
     return {
       message: 'Receta eliminada correctamente',
       name: recipeFound.name,
