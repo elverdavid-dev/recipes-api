@@ -12,7 +12,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
 import { fileFilter } from '../utils/fileUpload';
 import { CreateRecipeDto } from './dto/create-recipe.dto';
@@ -25,6 +25,7 @@ export class RecipesController {
   constructor(private readonly recipesService: RecipesService) {}
 
   @Get()
+  @ApiOperation({ summary: 'Obtener todas las recetas' })
   findAll(
     @Query('page', ParseIntPipe) page: number,
     @Query('limit', ParseIntPipe) limit: number,
@@ -33,26 +34,31 @@ export class RecipesController {
   }
 
   @Get('/latest')
+  @ApiOperation({ summary: 'Obtener las ultimas 10 recetas agregadas' })
   getLatestRecipes() {
     return this.recipesService.getLatestRecipes();
   }
 
   @Get('/search')
+  @ApiOperation({ summary: 'Buscar recetas por nombre' })
   searchByName(@Query() searchRecipeDto: SearchRecipeDto) {
     return this.recipesService.searchByName(searchRecipeDto);
   }
 
   @Get('/filter')
+  @ApiOperation({ summary: 'Filtrar todas las recetas de una categoria' })
   getRecipeByCategory(@Query('CategoryId') categoryId: string) {
     return this.recipesService.getRecipesByCategory(categoryId);
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Obtener receta por id' })
   findOne(@Param('id') id: string) {
     return this.recipesService.findOne(id);
   }
 
   @Post()
+  @ApiOperation({ summary: 'Crear nueva receta' })
   @UseInterceptors(
     FileInterceptor('image', {
       storage: diskStorage({ destination: './upload' }),
@@ -67,6 +73,7 @@ export class RecipesController {
   }
 
   @Put(':id')
+  @ApiOperation({ summary: 'Actualizar receta por id' })
   @UseInterceptors(
     FileInterceptor('image', {
       storage: diskStorage({ destination: './upload' }),
@@ -82,6 +89,7 @@ export class RecipesController {
   }
 
   @Delete(':id')
+  @ApiOperation({ summary: 'Eliminar receta por id' })
   remove(@Param('id') id: string) {
     return this.recipesService.remove(id);
   }
