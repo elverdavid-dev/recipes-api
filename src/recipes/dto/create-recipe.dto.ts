@@ -1,4 +1,10 @@
-import { ArrayNotEmpty, IsArray, IsNotEmpty, IsString } from 'class-validator';
+import {
+  ArrayNotEmpty,
+  IsArray,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class CreateRecipeDto {
   @IsNotEmpty({ message: 'El nombre es requerido!' })
@@ -20,6 +26,10 @@ export class CreateRecipeDto {
   @IsArray({ message: 'Los pasos deben ser proporcionados como una lista!' })
   @ArrayNotEmpty({ message: 'La lista de pasos no puede estar vacía!' })
   steps: string[];
+
+  @IsOptional()
+  @IsString({ message: 'La region debe ser un texto' })
+  country?: string;
 
   @IsNotEmpty({ message: 'La categoría es requerida' })
   @IsString({ message: 'La categoría debe ser un texto' })
