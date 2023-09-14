@@ -14,6 +14,8 @@ export class Recipe {
 
   @Prop({ type: [String], required: true, lowercase: true })
   steps: string[];
+  @Prop({ type: String, trim: true })
+  country?: string;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Category' })
   category: Category;

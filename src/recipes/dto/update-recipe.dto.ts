@@ -1,5 +1,11 @@
 import { PartialType } from '@nestjs/mapped-types';
-import { ArrayNotEmpty, IsArray, IsNotEmpty, IsString } from 'class-validator';
+import {
+  ArrayNotEmpty,
+  IsArray,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { CreateRecipeDto } from './create-recipe.dto';
 
 export class UpdateRecipeDto extends PartialType(CreateRecipeDto) {
@@ -22,6 +28,10 @@ export class UpdateRecipeDto extends PartialType(CreateRecipeDto) {
   @IsArray({ message: 'Los pasos deben ser proporcionados como una lista!' })
   @ArrayNotEmpty({ message: 'La lista de pasos no puede estar vacía!' })
   steps?: string[];
+
+  @IsOptional()
+  @IsString({ message: 'La region debe ser un texto' })
+  country?: string;
 
   @IsNotEmpty({ message: 'La categoría es requerida' })
   @IsString({ message: 'La categoría debe ser un texto' })
