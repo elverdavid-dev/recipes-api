@@ -34,9 +34,9 @@ export class RecipesController {
   }
 
   @Get('/latest')
-  @ApiOperation({ summary: 'Obtener las ultimas 10 recetas agregadas' })
-  getLatestRecipes() {
-    return this.recipesService.getLatestRecipes();
+  @ApiOperation({ summary: 'Obtener las ultimas recetas agregadas' })
+  getLatestRecipes(@Query('limit', ParseIntPipe) limit: number) {
+    return this.recipesService.getLatestRecipes(limit);
   }
 
   @Get('/search')
