@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { CategoriesModule } from './categories/categories.module';
 import { RecipesModule } from './recipes/recipes.module';
 import { CloudinaryConfigProvider } from './utils/cloudinary.config';
+import { CountrysModule } from './countrys/countrys.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { CloudinaryConfigProvider } from './utils/cloudinary.config';
     CacheModule.register({ isGlobal: true, ttl: 60000, store: 'memory' }),
     RecipesModule,
     CategoriesModule,
+    CountrysModule,
   ],
   controllers: [],
   providers: [CloudinaryConfigProvider],
