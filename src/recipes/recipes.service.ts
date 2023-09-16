@@ -95,11 +95,11 @@ export class RecipesService {
   }
 
   /**
-   * obtener las ultimas 10 recetas agregadas
-   * @returns Lista de las ultimas 10 recetas
+   * obtener las ultimas recetas agregadas
+   * @returns Lista de las ultimas  recetas
    */
-  async getLatestRecipes() {
-    return await this.RecipeEntity.find().limit(10).sort({ createdAt: -1 });
+  async getLatestRecipes(limit: number) {
+    return await this.RecipeEntity.find().limit(limit).sort({ createdAt: -1 });
   }
 
   /**
