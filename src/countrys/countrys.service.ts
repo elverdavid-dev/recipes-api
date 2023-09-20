@@ -13,8 +13,22 @@ export class CountrysService {
     @InjectModel(Country.name) private CountryEntity: Model<Country>,
   ) {}
 
+  async findAll() {
+    return await this.CountryEntity.find()
+      .select('-public_id')
+      .sort({ createdAt: -1 });
+  }
+
+  async findOne(id: string) {
+    return await this.CountryEntity.findById(id).select('-public_id');
+  }
+
   /**
    * @description servicio para crear una region relacionada a una receta
+   * @param createCountryDto - datos de la nueva region
+   * @param image - imagen relacionado a la region
+   * @returns Un mensaje de éxito y el nombre de la region creada.
+   * @throws {HttpException} Si ocurre un error durante el proceso de creación.
    */
   async create(createCountryDto: CreateCountryDto, image: Express.Multer.File) {
     try {
@@ -39,19 +53,11 @@ export class CountrysService {
     }
   }
 
-  async findAll() {
-    return await this.CountryEntity.find();
-  }
-
-  async findOne(id: number) {
-    return await this.CountryEntity.findById(id);
-  }
-
-  async update(id: number, updateCountryDto: UpdateCountryDto) {
+  async update(id: string, updateCountryDto: UpdateCountryDto) {
     return this.CountryEntity.findByIdAndUpdate(id, updateCountryDto);
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     return await this.CountryEntity.findByIdAndDelete(id);
   }
 }
