@@ -85,6 +85,7 @@ export class RecipesService {
   async findOne(id: string) {
     const recipe = await this.RecipeEntity.findById(id)
       .populate('category', '-public_id')
+      .populate('country', '-public_id')
       .select('-public_id');
 
     //Si la receta no existe entonces error 404
@@ -100,7 +101,12 @@ export class RecipesService {
    * @returns Lista de las ultimas  recetas
    */
   async getLatestRecipes(limit: number) {
-    return await this.RecipeEntity.find().limit(limit).sort({ createdAt: -1 });
+    return await this.RecipeEntity.find()
+      .limit(limit)
+      .sort({ createdAt: -1 })
+      .populate('category', '-public_id')
+      .populate('country', '-public_id')
+      .select('-public_id');
   }
 
   /**
@@ -114,6 +120,7 @@ export class RecipesService {
 
     const recipes = await this.RecipeEntity.find(query)
       .populate('category', '-public_id')
+      .populate('country', '-public_id')
       .select('-public_id')
       .sort({ createdAt: -1 });
     if (recipes.length === 0) {
@@ -134,7 +141,7 @@ export class RecipesService {
     })
       .select('-public_id')
       .populate('category', '-public_id')
-      .exec();
+      .populate('country', '-public_id');
 
     if (recipes.length === 0) {
       return { message: 'No hay recetas en esta categoria' };
