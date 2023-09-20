@@ -7,6 +7,7 @@ import {
   IsString,
 } from 'class-validator';
 import { CreateRecipeDto } from './create-recipe.dto';
+import { Types } from 'mongoose';
 
 export class UpdateRecipeDto extends PartialType(CreateRecipeDto) {
   @IsNotEmpty({ message: 'El nombre es requerido!' })
@@ -30,12 +31,10 @@ export class UpdateRecipeDto extends PartialType(CreateRecipeDto) {
   steps?: string[];
 
   @IsOptional()
-  @IsString({ message: 'La region debe ser un texto' })
-  country?: string;
+  country?: Types.ObjectId;
 
   @IsNotEmpty({ message: 'La categoría es requerida' })
-  @IsString({ message: 'La categoría debe ser un texto' })
-  category?: string;
+  category?: Types.ObjectId;
 
   image?: string;
 

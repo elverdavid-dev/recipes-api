@@ -52,6 +52,7 @@ export class RecipesService {
         .skip(skip)
         .limit(limit)
         .populate('category', '-public_id')
+        .populate('country', '-public_id')
         .select('-public_id')
         .sort({ createdAt: -1 });
 
@@ -172,6 +173,8 @@ export class RecipesService {
       };
     } catch (error) {
       console.log(error);
+      const a = await fse.unlink(image.path);
+      console.log(a);
       throw new HttpException(
         'Error al crear la receta',
         HttpStatus.INTERNAL_SERVER_ERROR,

@@ -1,10 +1,12 @@
 import {
   ArrayNotEmpty,
   IsArray,
+  IsMongoId,
   IsNotEmpty,
   IsOptional,
   IsString,
 } from 'class-validator';
+import { Types } from 'mongoose';
 
 export class CreateRecipeDto {
   @IsNotEmpty({ message: 'El nombre es requerido!' })
@@ -28,12 +30,12 @@ export class CreateRecipeDto {
   steps: string[];
 
   @IsOptional()
-  @IsString({ message: 'La region debe ser un texto' })
-  country?: string;
+  @IsMongoId({ message: 'Country tiene que ser de tipo objectId' })
+  country?: Types.ObjectId;
 
   @IsNotEmpty({ message: 'La categoría es requerida' })
-  @IsString({ message: 'La categoría debe ser un texto' })
-  category: string;
+  @IsMongoId({ message: 'Category tiene que ser de tipo objectId' })
+  category: Types.ObjectId;
 
-  file: Express.Multer.File;
+  image: Express.Multer.File | string;
 }
