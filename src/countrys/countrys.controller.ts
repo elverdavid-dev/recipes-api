@@ -15,7 +15,7 @@ import { UpdateCountryDto } from './dto/update-country.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { fileFilter } from '../utils/fileUpload';
-import { ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiConsumes, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 
 @Controller('countrys')
 @ApiTags('Regiones')
@@ -42,6 +42,7 @@ export class CountrysController {
   @ApiOperation({
     summary: 'Obtener una region por id',
   })
+  @ApiParam({ name: 'id', description: 'Id de la region que se desea obtener' })
   findOne(@Param('id') id: string) {
     return this.countrysService.findOne(id);
   }
@@ -81,12 +82,30 @@ export class CountrysController {
    * @description Controlador de el servicio de actualizar una región por id.
    */
   @Put(':id')
+  //Subida de imagene
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: diskStorage({ destination: './upload' }),
+      fileFilter,
+    }),
+  )
+  //Documentacion
   @ApiOperation({
     summary: 'Actualizar una region por id',
   })
+  @ApiParam({
+    name: 'id',
+    description: 'Id de la region que se desea actualizar',
+  })
   @ApiConsumes('multipart/form-data')
-  update(@Param('id') id: string, @Body() updateCountryDto: UpdateCountryDto) {
-    return this.countrysService.update(id, updateCountryDto);
+  //Controlador
+  update(
+    @Param('id') id: string,
+    @Body() updateCountryDto: UpdateCountryDto,
+    @UploadedFile()
+    image: Express.Multer.File,
+  ) {
+    return this.countrysService.update(id, updateCountryDto, image);
   }
 
   /**
@@ -94,6 +113,10 @@ export class CountrysController {
    */
   @Delete(':id')
   @ApiOperation({ summary: 'Eliminar una region por id' })
+  @ApiParam({
+    name: 'id',
+    description: 'Id de la region que se desea eliminar',
+  })
   remove(@Param('id') id: string) {
     return this.countrysService.remove(id);
   }

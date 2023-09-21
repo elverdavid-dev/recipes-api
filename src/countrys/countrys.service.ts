@@ -4,7 +4,7 @@ import { UpdateCountryDto } from './dto/update-country.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Country } from './entities/country.entity';
 import { Model } from 'mongoose';
-import { uploadImage } from 'src/utils/cloudinary.config';
+import { deleteImage, uploadImage } from 'src/utils/cloudinary.config';
 import * as fse from 'fs-extra';
 
 @Injectable()
@@ -16,7 +16,7 @@ export class CountrysService {
   async findAll() {
     return await this.CountryEntity.find()
       .select('-public_id')
-      .sort({ createdAt: -1 });
+      .sort({ _id: -1 });
   }
 
   async findOne(id: string) {
@@ -46,6 +46,7 @@ export class CountrysService {
         name: createCountryDto.name,
       };
     } catch (error) {
+      await fse.unlink(image.path);
       throw new HttpException(
         'Error al crear una region!',
         HttpStatus.BAD_REQUEST,
@@ -53,11 +54,41 @@ export class CountrysService {
     }
   }
 
-  async update(id: string, updateCountryDto: UpdateCountryDto) {
-    return this.CountryEntity.findByIdAndUpdate(id, updateCountryDto);
+  async update(
+    id: string,
+    updateCountryDto: UpdateCountryDto,
+    image: Express.Multer.File,
+  ) {
+    const countryFound = await this.CountryEntity.findById(id);
+    if (!countryFound) {
+      await fse.unlink(image.path);
+      throw new HttpException('La region no existe!', HttpStatus.NOT_FOUND);
+    }
+
+    if (image) {
+      await deleteImage(countryFound.public_id);
+      const newImage = await uploadImage(image.path, 'countrys');
+      await fse.unlink(image.path);
+      updateCountryDto.image = newImage.secure_url;
+      updateCountryDto.public_id = newImage.public_id;
+    }
+
+    await this.CountryEntity.findByIdAndUpdate(id, updateCountryDto);
+    return {
+      message: 'Region actualizada correctamente',
+      name: countryFound.name,
+    };
   }
 
   async remove(id: string) {
-    return await this.CountryEntity.findByIdAndDelete(id);
+    const countryFound = await this.CountryEntity.findById(id);
+    if (!countryFound) {
+      throw new HttpException('La region no existe!', HttpStatus.NOT_FOUND);
+    }
+    await this.CountryEntity.findByIdAndDelete(id);
+    return {
+      message: 'Region eliminada correctamente',
+      name: countryFound.name,
+    };
   }
 }
