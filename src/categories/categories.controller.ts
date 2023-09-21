@@ -10,7 +10,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiConsumes, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
 import { fileFilter } from 'src/utils/fileUpload';
 import { CategoriesService } from './categories.service';
@@ -22,20 +22,37 @@ import { UpdateCategoryDto } from './dto/update-category.dto';
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
+  /**
+   * @description Controlador de el servicio de obtener todas las categorias.
+   */
+
   @Get()
   @ApiOperation({ summary: 'Obtener todas las categorias' })
   findAll() {
     return this.categoriesService.findAll();
   }
 
+  /**
+   * @description Controlador de el servicio de obtener una categoria por id.
+   */
+
   @Get(':id')
   @ApiOperation({ summary: 'Obtener categoria por id' })
+  @ApiParam({
+    name: 'id',
+    description: 'Id de la categoria que se desea obtener por id',
+  })
   findOne(@Param('id') id: string) {
     return this.categoriesService.findOne(id);
   }
 
+  /**
+   * @description Controlador de el servicio de crear una nueva categoria.
+   */
+
   @Post()
   @ApiOperation({ summary: 'Crear una nueva categoria' })
+  @ApiConsumes('multipart/form-data')
   @UseInterceptors(
     FileInterceptor('image', {
       storage: diskStorage({
@@ -52,8 +69,17 @@ export class CategoriesController {
     return this.categoriesService.create(createCategoryDto, image);
   }
 
+  /**
+   * @description Controlador de el servicio de actualizar categoria por id.
+   */
+
   @Put(':id')
   @ApiOperation({ summary: 'Actualizar categoria por id' })
+  @ApiConsumes('multipart/form-data')
+  @ApiParam({
+    name: 'id',
+    description: 'Id de la categoria que se desea actualizar',
+  })
   @UseInterceptors(
     FileInterceptor('image', {
       storage: diskStorage({ destination: './upload' }),
@@ -68,8 +94,16 @@ export class CategoriesController {
     return this.categoriesService.update(id, updateCategoryDto, image);
   }
 
+  /**
+   * @description Controlador de el servicio de eliminar una categoria por id.
+   */
+
   @Delete(':id')
   @ApiOperation({ summary: 'Eliminar categoria por id' })
+  @ApiParam({
+    name: 'id',
+    description: 'Id de la categoria que se desea Eliminar',
+  })
   remove(@Param('id') id: string) {
     return this.categoriesService.remove(id);
   }
