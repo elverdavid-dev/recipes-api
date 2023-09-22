@@ -88,7 +88,7 @@ export class RecipesController {
    * @description Controlador de el servicio de buscar todas las recetas relacionada a una categoria.
    */
 
-  @Get('/filter/recipes')
+  @Get('/filter/categories')
   @ApiOperation({ summary: 'Filtrar todas las recetas de una categoria' })
   @ApiQuery({
     name: 'CategoryId',
