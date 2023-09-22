@@ -40,7 +40,7 @@ export class RecipesController {
   @ApiOperation({ summary: 'Obtener todas las recetas' })
   @ApiQuery({
     name: 'page',
-    description: 'agrega la pagina que desea ver por ejemplo la pagina 1',
+    description: 'agrega la pagina que se desea ver por ejemplo la pagina 1',
   })
   @ApiQuery({
     name: 'limit',

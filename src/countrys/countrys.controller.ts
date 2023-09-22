@@ -8,6 +8,8 @@ import {
   UseInterceptors,
   UploadedFile,
   Put,
+  Query,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { CountrysService } from './countrys.service';
 import { CreateCountryDto } from './dto/create-country.dto';
@@ -15,7 +17,13 @@ import { UpdateCountryDto } from './dto/update-country.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { fileFilter } from '../utils/fileUpload';
-import { ApiConsumes, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import {
+  ApiConsumes,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 
 @Controller('countrys')
 @ApiTags('Regiones')
@@ -27,11 +35,25 @@ export class CountrysController {
    */
 
   @Get()
+  //Documentacion
   @ApiOperation({
     summary: 'Obtener todas las regiones',
   })
-  findAll() {
-    return this.countrysService.findAll();
+  @ApiQuery({
+    name: 'page',
+    description: 'agrega la pagina que se desea ver por ejemplo la pagina 1',
+  })
+  @ApiQuery({
+    name: 'limit',
+    description:
+      'limite de regiones por pagina que se desea ver, por ejemplo 5 regiones por paginas',
+  })
+  //Controlador
+  findAll(
+    @Query('page', ParseIntPipe) page: number,
+    @Query('limit', ParseIntPipe) limit: number,
+  ) {
+    return this.countrysService.findAll(page, limit);
   }
 
   /**
