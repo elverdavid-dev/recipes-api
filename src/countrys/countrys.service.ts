@@ -13,14 +13,46 @@ export class CountrysService {
     @InjectModel(Country.name) private CountryEntity: Model<Country>,
   ) {}
 
-  async findAll() {
-    return await this.CountryEntity.find()
+  /**
+   * Servicio para obtener todas las regiones
+   * @returns Lista de las regiones
+   */
+
+  async findAll(page: number, limit: number) {
+    console.log(page);
+    const totalCountrys = await this.CountryEntity.countDocuments();
+    const totalPages = Math.ceil(totalCountrys / limit);
+    if (page < 0 || page > totalPages) {
+      throw new HttpException('Página no encontrada', HttpStatus.NOT_FOUND);
+    }
+    const skip = (page - 1) * limit;
+    const listCountrys = await this.CountryEntity.find()
+      .skip(skip)
+      .limit(limit)
       .select('-public_id')
       .sort({ _id: -1 });
+    const pageData = {
+      page,
+      totalPages,
+      totalCountrys,
+      data: listCountrys,
+    };
+    return pageData;
   }
 
+  /**
+   * Servicio para obtener región por id
+   * @param id - Id de la región que se desea buscar
+   * @returns región especifica buscada
+   * @throws {HttpException} si la región no existe
+   */
+
   async findOne(id: string) {
-    return await this.CountryEntity.findById(id).select('-public_id');
+    const country = await this.CountryEntity.findById(id).select('-public_id');
+    if (!country) {
+      throw new HttpException('La region no existe', HttpStatus.NOT_FOUND);
+    }
+    return country;
   }
 
   /**
@@ -54,6 +86,15 @@ export class CountrysService {
     }
   }
 
+  /**
+   * Servicio para actualizar una region ya existente
+   * @param id - Id de la region que se desea actualizar
+   * @param updateCountryDto - Datos actualizados de la categora.
+   * @param image - si la imagen de la region se desea actualiza
+   * @returns Un mensaje de éxito y el nombre de la region actualizada.
+   * @throws {HttpException} Si la region no existe.
+   *  */
+
   async update(
     id: string,
     updateCountryDto: UpdateCountryDto,
@@ -80,6 +121,12 @@ export class CountrysService {
     };
   }
 
+  /**
+   * Servicio para eliminar una region existente.
+   * @param id - ID de la region que se desea eliminar.
+   * @returns Un mensaje de éxito y el nombre de la region eliminada.
+   * @throws {HttpException} Si la region no existe.
+   */
   async remove(id: string) {
     const countryFound = await this.CountryEntity.findById(id);
     if (!countryFound) {

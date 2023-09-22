@@ -40,7 +40,7 @@ export class RecipesController {
   @ApiOperation({ summary: 'Obtener todas las recetas' })
   @ApiQuery({
     name: 'page',
-    description: 'agrega la pagina que desea ver por ejemplo la pagina 1',
+    description: 'agrega la pagina que se desea ver por ejemplo la pagina 1',
   })
   @ApiQuery({
     name: 'limit',
@@ -88,17 +88,31 @@ export class RecipesController {
    * @description Controlador de el servicio de buscar todas las recetas relacionada a una categoria.
    */
 
-  @Get('/filter')
+  @Get('/filter/recipes')
   @ApiOperation({ summary: 'Filtrar todas las recetas de una categoria' })
   @ApiQuery({
     name: 'CategoryId',
     description:
       'Id de la categoria por la cual desea buscar las recetas relacionadas a esa categoria',
   })
-  getRecipeByCategory(@Query('CategoryId') categoryId: string) {
-    return this.recipesService.getRecipesByCategory(categoryId);
+  getAllRecipesOneCategory(@Query('CategoryId') categoryId: string) {
+    return this.recipesService.getAllRecipesOneCategory(categoryId);
   }
 
+  /**
+   * @description Controlador de el servicio de buscar todas las recetas relacionada a una región.
+   */
+
+  @Get('filter/countrys')
+  @ApiOperation({ summary: 'Filtrar todas las recetas de un pais o region' })
+  @ApiQuery({
+    name: 'countryId',
+    description:
+      'Id de la región por la cual desea buscar las recetas relacionadas a esa región',
+  })
+  getAllRecipesOneCountry(@Query('countryId') countryId: string) {
+    return this.recipesService.getAllRecipesOneCountry(countryId);
+  }
   /**
    * @description Controlador de el servicio de obtener una receta por el id.
    */
