@@ -19,8 +19,12 @@ export class CountrysService {
    */
 
   async findAll(page: number, limit: number) {
+    console.log(page);
     const totalCountrys = await this.CountryEntity.countDocuments();
     const totalPages = Math.ceil(totalCountrys / limit);
+    if (page < 0 || page > totalPages) {
+      throw new HttpException('Página no encontrada', HttpStatus.NOT_FOUND);
+    }
     const skip = (page - 1) * limit;
     const listCountrys = await this.CountryEntity.find()
       .skip(skip)

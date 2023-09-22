@@ -133,9 +133,9 @@ export class RecipesService {
    *  Servicio para obtener o filtrar todas las recetas de una categoría específica.
    * @param categoryId - ID de la categoría por la cual deseas filtrar las recetas.
    * @returns Lista de todas las recetas asociada a esa categoria
-   * @throws Mensaje que indica que no hay recetas asociadas a esa catrgoria
+   * @throws Mensaje que indica que no hay recetas asociadas a esa categoria
    */
-  async getRecipesByCategory(categoryId: string) {
+  async getAllRecipesOneCategory(categoryId: string) {
     const recipes = await this.RecipeEntity.find({
       category: categoryId,
     })
@@ -149,6 +149,24 @@ export class RecipesService {
     return recipes;
   }
 
+  /**
+   *  Servicio para obtener o filtrar todas las recetas de una región específica.
+   * @param countryId - ID de la región por la cual deseas filtrar las recetas.
+   * @returns Lista de todas las recetas asociada a esa región
+   * @throws Mensaje que indica que no hay recetas asociadas a esa región
+   */
+
+  async getAllRecipesOneCountry(countryId: string) {
+    const recipes = await this.RecipeEntity.find({ country: countryId })
+      .select('-public_id')
+      .populate('category', '-public_id')
+      .populate('country', '-public_id');
+
+    if (recipes.length === 0) {
+      return { message: 'No hay recetas en esta categoria' };
+    }
+    return recipes;
+  }
   /**
    * Servicio para crea una nueva receta con los detalles proporcionados y la imagen asociada.
    * @param createRecipeDto - Datos de la receta a crear.
