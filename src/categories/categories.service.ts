@@ -7,6 +7,7 @@ import { deleteImage, uploadImage } from 'src/utils/cloudinary.config';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category } from './entities/category.entity';
+import { deleteCacheByKey, getDataCache } from '@utils/cache.utils';
 
 @Injectable()
 export class CategoriesService {
@@ -16,27 +17,27 @@ export class CategoriesService {
   ) {}
 
   private readonly cacheKey = 'categories_cache_key';
-  private async deleteCacheByKey(cacheKey: string): Promise<void> {
-    await this.cacheManager.del(cacheKey);
-  }
+
   /**
    * Servicio para obtener todas las categorias
    * @returns Lista de las categorias
    */
   async findAll() {
     //Obtener categorias de la cache si existe
-    const cacheData = await this.cacheManager.get(this.cacheKey);
-    //Si no hay datos en la cache entonces se agregan
-    if (!cacheData) {
-      const categories = await this.CategoryEntity.find()
-        .select('-public_id')
-        .sort({ createdAt: -1 });
-      await this.cacheManager.set(this.cacheKey, categories);
+    const cacheData = await getDataCache(this.cacheManager, this.cacheKey);
 
-      return categories;
+    //si los datos existen en cache entonces los retorna
+    if (cacheData) {
+      return cacheData;
     }
 
-    return cacheData;
+    //Si no hay datos en la cache entonces se agregan
+    const categories = await this.CategoryEntity.find()
+      .select('-public_id')
+      .sort({ createdAt: -1 });
+    await this.cacheManager.set(this.cacheKey, categories);
+
+    return categories;
   }
 
   /**
@@ -69,7 +70,7 @@ export class CategoriesService {
   ) {
     try {
       //Eliminar las categorias de la cache si existen
-      await this.deleteCacheByKey(this.cacheKey);
+      await deleteCacheByKey(this.cacheManager, this.cacheKey);
       //subir imagen a cloudinary y eliminarla de la carpeta upload
       const cloudinaryResponse = await uploadImage(image.path, 'categories');
       await fse.unlink(image.path);
@@ -80,7 +81,7 @@ export class CategoriesService {
         public_id: cloudinaryResponse.public_id,
       });
       newCategory.save();
-      await this.deleteCacheByKey(this.cacheKey);
+      await deleteCacheByKey(this.cacheManager, this.cacheKey);
 
       return {
         message: 'Categoria creada correctamente',
@@ -118,7 +119,7 @@ export class CategoriesService {
         );
       }
       //Eliminar cache
-      await this.deleteCacheByKey(this.cacheKey);
+      await deleteCacheByKey(this.cacheManager, this.cacheKey);
       //Actualizar imagen
       if (image) {
         const newImage = await uploadImage(image.path, 'categories');
@@ -151,7 +152,7 @@ export class CategoriesService {
       throw new HttpException('La categoria no existe!', HttpStatus.NOT_FOUND);
     }
     //Eliminar cache si existe
-    await this.deleteCacheByKey(this.cacheKey);
+    await deleteCacheByKey(this.cacheManager, this.cacheKey);
     //Eliminar imagen de cloudinary y eliminar categoria de la DB
     await deleteImage(categoryFound.public_id);
     await this.CategoryEntity.findByIdAndDelete(id);

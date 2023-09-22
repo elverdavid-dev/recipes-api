@@ -8,7 +8,12 @@ import { CreateRecipeDto } from './dto/create-recipe.dto';
 import { SearchRecipeDto } from './dto/search-recipe.dto';
 import { UpdateRecipeDto } from './dto/update-recipe.dto';
 import { Recipe } from './entities/recipe.entity';
-
+import { paginateResults } from '@utils/paginate.utlis';
+import {
+  deleteCacheByKey,
+  generateCacheKey,
+  getDataCache,
+} from '@utils/cache.utils';
 @Injectable()
 export class RecipesService {
   constructor(
@@ -17,13 +22,6 @@ export class RecipesService {
   ) {}
 
   private cacheKey = '';
-  private generateCacheKey(page: number, limit: number): string {
-    return `recipes_list_page_${page}_${limit}`;
-  }
-
-  private async deleteCacheByKey(cacheKey: string): Promise<void> {
-    await this.cacheManager.del(cacheKey);
-  }
 
   /**
    * Servicio para obtener todas las recetas
@@ -34,45 +32,44 @@ export class RecipesService {
    */
   async findAll(page: number, limit: number) {
     //Generar cacheKey
-    this.cacheKey = this.generateCacheKey(page, limit);
+    this.cacheKey = generateCacheKey(page, limit);
+
     //Obtener las recetas de la cache si existe
-    const cacheData = await this.cacheManager.get(this.cacheKey);
+    const cacheData = await getDataCache(this.cacheManager, this.cacheKey);
+
     //Obtener el total de recetas agregadas a la DB
     const totalRecipes = await this.RecipeEntity.countDocuments();
-    //Total de paginas
-    const totalPages = Math.ceil(totalRecipes / limit);
-    //Si page es menor que uno o mayor que el valor de totalPages entonce error 404
-    if (page < 1 || page > totalPages) {
-      throw new HttpException('Página no encontrada', HttpStatus.NOT_FOUND);
+
+    const { currentPage, totalItems, totalPages } = paginateResults(
+      totalRecipes,
+      page,
+      limit,
+    );
+
+    //si los datos existen en cache entonces los retorna
+    if (cacheData) {
+      return cacheData;
     }
+
     //Si no hay datos en cache entoce se agregan
-    if (!cacheData) {
-      const skip = (page - 1) * limit;
-      const recipes = await this.RecipeEntity.find()
-        .skip(skip)
-        .limit(limit)
-        .populate('category', '-public_id')
-        .populate('country', '-public_id')
-        .select('-public_id')
-        .sort({ createdAt: -1 });
+    const skip = (page - 1) * limit;
+    const listRecipes = await this.RecipeEntity.find()
+      .skip(skip)
+      .limit(limit)
+      .populate('category', '-public_id')
+      .populate('country', '-public_id')
+      .select('-public_id')
+      .sort({ createdAt: -1 });
 
-      const recipePageData = {
-        page,
-        totalPages,
-        totalRecipes,
-        data: recipes,
-      };
-      await this.cacheManager.set(this.cacheKey, recipePageData);
+    const recipePageData = {
+      page: currentPage,
+      totalPages,
+      totalRecipes: totalItems,
+      data: listRecipes,
+    };
+    await this.cacheManager.set(this.cacheKey, recipePageData);
 
-      return {
-        page,
-        totalPages,
-        totalRecipes,
-        data: recipes,
-      };
-    }
-
-    return cacheData;
+    return recipePageData;
   }
 
   /**
@@ -178,7 +175,7 @@ export class RecipesService {
     try {
       //Eliminar la cache
       if (this.cacheKey) {
-        await this.deleteCacheByKey(this.cacheKey);
+        await deleteCacheByKey(this.cacheManager, this.cacheKey);
         this.cacheKey = '';
       }
       //subir imagen a cloudinary y eliminarla de la carpeta upload
@@ -198,8 +195,8 @@ export class RecipesService {
       };
     } catch (error) {
       console.log(error);
-      const a = await fse.unlink(image.path);
-      console.log(a);
+      await fse.unlink(image.path);
+
       throw new HttpException(
         'Error al crear la receta',
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -227,7 +224,7 @@ export class RecipesService {
     }
     //Eliminar cache
     if (this.cacheKey) {
-      await this.deleteCacheByKey(this.cacheKey);
+      await deleteCacheByKey(this.cacheManager, this.cacheKey);
       this.cacheKey = '';
     }
     //actualizar la imagen
@@ -261,7 +258,8 @@ export class RecipesService {
     }
     //Eliminar cache
     if (this.cacheKey) {
-      await this.deleteCacheByKey(this.cacheKey);
+      await deleteCacheByKey(this.cacheManager, this.cacheKey);
+
       this.cacheKey = '';
     }
     //Eliminar receta y eliminar imagen de cloudinary

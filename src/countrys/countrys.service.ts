@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { CreateCountryDto } from './dto/create-country.dto';
 import { UpdateCountryDto } from './dto/update-country.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -6,25 +6,47 @@ import { Country } from './entities/country.entity';
 import { Model } from 'mongoose';
 import { deleteImage, uploadImage } from 'src/utils/cloudinary.config';
 import * as fse from 'fs-extra';
-
+import {
+  deleteCacheByKey,
+  generateCacheKey,
+  getDataCache,
+} from '@utils/cache.utils';
+import { paginateResults } from '@utils/paginate.utlis';
+import { Cache } from 'cache-manager';
 @Injectable()
 export class CountrysService {
   constructor(
     @InjectModel(Country.name) private CountryEntity: Model<Country>,
+    @Inject('CACHE_MANAGER') private cacheManager: Cache,
   ) {}
 
+  private cacheKey = '';
   /**
    * Servicio para obtener todas las regiones
    * @returns Lista de las regiones
    */
 
   async findAll(page: number, limit: number) {
-    console.log(page);
+    //Generar cacheKey
+    this.cacheKey = generateCacheKey(page, limit);
+    //Obtener las regiones de la cache si existe
+    const cacheData = await getDataCache(this.cacheManager, this.cacheKey);
+
+    //Obtener el total de regiones agregadas a la DB
     const totalCountrys = await this.CountryEntity.countDocuments();
-    const totalPages = Math.ceil(totalCountrys / limit);
-    if (page < 0 || page > totalPages) {
-      throw new HttpException('Página no encontrada', HttpStatus.NOT_FOUND);
+
+    //paginacion
+    const { currentPage, totalItems, totalPages } = paginateResults(
+      totalCountrys,
+      page,
+      limit,
+    );
+
+    //si los datos existen en cache entonces los retorna
+    if (cacheData) {
+      return cacheData;
     }
+
     const skip = (page - 1) * limit;
     const listCountrys = await this.CountryEntity.find()
       .skip(skip)
@@ -32,9 +54,9 @@ export class CountrysService {
       .select('-public_id')
       .sort({ _id: -1 });
     const pageData = {
-      page,
+      page: currentPage,
       totalPages,
-      totalCountrys,
+      totalCountrys: totalItems,
       data: listCountrys,
     };
     return pageData;
@@ -64,6 +86,12 @@ export class CountrysService {
    */
   async create(createCountryDto: CreateCountryDto, image: Express.Multer.File) {
     try {
+      //Eliminar la cache
+      if (this.cacheKey) {
+        await deleteCacheByKey(this.cacheManager, this.cacheKey);
+        this.cacheKey = '';
+      }
+
       const cloudinaryResponse = await uploadImage(image.path, 'countrys');
       await fse.unlink(image.path);
 
@@ -104,6 +132,18 @@ export class CountrysService {
     if (!countryFound) {
       await fse.unlink(image.path);
       throw new HttpException('La region no existe!', HttpStatus.NOT_FOUND);
+    }
+
+    //Eliminar la cache
+    if (this.cacheKey) {
+      await deleteCacheByKey(this.cacheManager, this.cacheKey);
+      this.cacheKey = '';
+    }
+
+    //Eliminar la cache
+    if (this.cacheKey) {
+      await deleteCacheByKey(this.cacheManager, this.cacheKey);
+      this.cacheKey = '';
     }
 
     if (image) {
