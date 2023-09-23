@@ -6,7 +6,7 @@ export function paginateResults(
   limit: number,
 ) {
   const totalPages = Math.ceil(totalItems / limit);
-  console.log(totalPages);
+
   if (page < 1 || page > totalPages) {
     throw new HttpException('Página no encontrada', HttpStatus.NOT_FOUND);
   }

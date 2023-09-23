@@ -4,6 +4,7 @@ import {
   IsArray,
   IsMongoId,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
 } from 'class-validator';
@@ -56,5 +57,9 @@ export class CreateRecipeDto {
     description:
       'Al agregar una imagen de cualquiera de estos tipo png,svg,jpg,jpge,webp,avif , se guardara en el servicio en la nube de cloudinary , esto generara una url que es la que se guardara en la base de datos',
   })
+  @IsNotEmpty({ message: 'La duracion es requerida!' })
+  // @IsNumber()
+  duration: number;
+
   image: Express.Multer.File | string;
 }
