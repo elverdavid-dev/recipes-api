@@ -136,8 +136,10 @@ export class RecipesService {
     page: number,
     limit: number,
   ) {
-    const totalRecipes = await this.RecipeEntity.countDocuments();
-    const { currentPage, totalItems, totalPages, skip } = paginateResults(
+    const totalRecipes = await this.RecipeEntity.countDocuments({
+      category: categoryId,
+    });
+    const { currentPage, skip, totalItems, totalPages } = paginateResults(
       totalRecipes,
       page,
       limit,
@@ -155,11 +157,11 @@ export class RecipesService {
     if (recipes.length === 0) {
       return { message: 'No hay recetas en esta categoria' };
     }
-
+    console.log(recipes.length);
     const pageData = {
       page: currentPage,
       totalPages,
-      totalItems: recipes.length,
+      totalItems,
       data: recipes,
     };
     return pageData;
