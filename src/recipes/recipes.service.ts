@@ -40,7 +40,7 @@ export class RecipesService {
     //Obtener el total de recetas agregadas a la DB
     const totalRecipes = await this.RecipeEntity.countDocuments();
 
-    const { currentPage, totalItems, totalPages } = paginateResults(
+    const { currentPage, totalItems, totalPages, skip } = paginateResults(
       totalRecipes,
       page,
       limit,
@@ -52,7 +52,6 @@ export class RecipesService {
     }
 
     //Si no hay datos en cache entoce se agregan
-    const skip = (page - 1) * limit;
     const listRecipes = await this.RecipeEntity.find()
       .skip(skip)
       .limit(limit)
@@ -64,7 +63,7 @@ export class RecipesService {
     const recipePageData = {
       page: currentPage,
       totalPages,
-      totalRecipes: totalItems,
+      totalItems,
       data: listRecipes,
     };
     await this.cacheManager.set(this.cacheKey, recipePageData);
@@ -160,7 +159,7 @@ export class RecipesService {
     const pageData = {
       page: currentPage,
       totalPages,
-      totalCountrys: totalItems,
+      totalItems,
       data: recipes,
     };
     return pageData;
