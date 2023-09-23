@@ -22,6 +22,10 @@ export class Recipe {
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Country' })
   country?: Country;
+
+  @Prop({ required: true })
+  duration: number;
+
   @Prop({ required: true })
   image: string;
 
