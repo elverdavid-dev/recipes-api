@@ -159,7 +159,7 @@ export class RecipesService {
     const pageData = {
       page: currentPage,
       totalPages,
-      totalItems,
+      totalItems: recipes.length,
       data: recipes,
     };
     return pageData;
