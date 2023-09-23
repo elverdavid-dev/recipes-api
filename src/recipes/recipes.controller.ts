@@ -89,14 +89,33 @@ export class RecipesController {
    */
 
   @Get('/filter/categories')
+  //Documentacion
   @ApiOperation({ summary: 'Filtrar todas las recetas de una categoria' })
   @ApiQuery({
     name: 'CategoryId',
     description:
       'Id de la categoria por la cual desea buscar las recetas relacionadas a esa categoria',
   })
-  getAllRecipesOneCategory(@Query('CategoryId') categoryId: string) {
-    return this.recipesService.getAllRecipesOneCategory(categoryId);
+  @ApiQuery({
+    name: 'page',
+    description: 'agrega la pagina que se desea ver por ejemplo la pagina 1',
+  })
+  @ApiQuery({
+    name: 'limit',
+    description:
+      'limite de recetas por pagina que se desea ver, por ejemplo 10 recetas por paginas',
+  })
+  //Controlador
+  getAllRecipesOneCategory(
+    @Query('CategoryId') categoryId: string,
+    @Query('page', ParseIntPipe) page: number,
+    @Query('limit', ParseIntPipe) limit: number,
+  ) {
+    return this.recipesService.getAllRecipesOneCategory(
+      categoryId,
+      page,
+      limit,
+    );
   }
 
   /**
