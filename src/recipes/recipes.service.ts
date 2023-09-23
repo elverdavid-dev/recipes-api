@@ -40,7 +40,7 @@ export class RecipesService {
     //Obtener el total de recetas agregadas a la DB
     const totalRecipes = await this.RecipeEntity.countDocuments();
 
-    const { currentPage, totalItems, totalPages } = paginateResults(
+    const { currentPage, totalItems, totalPages, skip } = paginateResults(
       totalRecipes,
       page,
       limit,
@@ -52,7 +52,6 @@ export class RecipesService {
     }
 
     //Si no hay datos en cache entoce se agregan
-    const skip = (page - 1) * limit;
     const listRecipes = await this.RecipeEntity.find()
       .skip(skip)
       .limit(limit)
@@ -64,7 +63,7 @@ export class RecipesService {
     const recipePageData = {
       page: currentPage,
       totalPages,
-      totalRecipes: totalItems,
+      totalItems,
       data: listRecipes,
     };
     await this.cacheManager.set(this.cacheKey, recipePageData);
@@ -132,10 +131,23 @@ export class RecipesService {
    * @returns Lista de todas las recetas asociada a esa categoria
    * @throws Mensaje que indica que no hay recetas asociadas a esa categoria
    */
-  async getAllRecipesOneCategory(categoryId: string) {
+  async getAllRecipesOneCategory(
+    categoryId: string,
+    page: number,
+    limit: number,
+  ) {
+    const totalRecipes = await this.RecipeEntity.countDocuments();
+    const { currentPage, totalItems, totalPages, skip } = paginateResults(
+      totalRecipes,
+      page,
+      limit,
+    );
+
     const recipes = await this.RecipeEntity.find({
       category: categoryId,
     })
+      .skip(skip)
+      .limit(limit)
       .select('-public_id')
       .populate('category', '-public_id')
       .populate('country', '-public_id');
@@ -143,7 +155,14 @@ export class RecipesService {
     if (recipes.length === 0) {
       return { message: 'No hay recetas en esta categoria' };
     }
-    return recipes;
+
+    const pageData = {
+      page: currentPage,
+      totalPages,
+      totalItems,
+      data: recipes,
+    };
+    return pageData;
   }
 
   /**

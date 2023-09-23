@@ -36,7 +36,7 @@ export class CountrysService {
     const totalCountrys = await this.CountryEntity.countDocuments();
 
     //paginacion
-    const { currentPage, totalItems, totalPages } = paginateResults(
+    const { currentPage, totalItems, totalPages, skip } = paginateResults(
       totalCountrys,
       page,
       limit,
@@ -47,7 +47,6 @@ export class CountrysService {
       return cacheData;
     }
 
-    const skip = (page - 1) * limit;
     const listCountrys = await this.CountryEntity.find()
       .skip(skip)
       .limit(limit)
@@ -56,7 +55,7 @@ export class CountrysService {
     const pageData = {
       page: currentPage,
       totalPages,
-      totalCountrys: totalItems,
+      totalItems,
       data: listCountrys,
     };
     return pageData;
