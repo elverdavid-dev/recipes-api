@@ -8,14 +8,19 @@ export function paginateResults(
   const totalPages = Math.ceil(totalItems / limit);
 
   const skip = (page - 1) * limit;
-  if (page < 1 || page > totalPages) {
-    throw new HttpException('Página no encontrada', HttpStatus.NOT_FOUND);
-  }
 
-  return {
+  const PageData = {
     totalItems,
     totalPages,
     currentPage: page,
     skip,
   };
+
+  if (totalPages === 0) {
+    return PageData;
+  } else if (page < 0 || page > totalPages) {
+    throw new HttpException('Página no encontrada', HttpStatus.NOT_FOUND);
+  }
+
+  return PageData;
 }

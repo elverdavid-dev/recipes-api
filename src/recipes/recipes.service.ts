@@ -131,6 +131,7 @@ export class RecipesService {
    * @returns Lista de todas las recetas asociada a esa categoria
    * @throws Mensaje que indica que no hay recetas asociadas a esa categoria
    */
+  //!
   async getAllRecipesOneCategory(
     categoryId: string,
     page: number,
