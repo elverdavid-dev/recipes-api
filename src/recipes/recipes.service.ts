@@ -1,5 +1,11 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import {
+  deleteCacheByKey,
+  generateCacheKey,
+  getDataCache,
+} from '@utils/cache.utils';
+import { paginateResults } from '@utils/paginate.utlis';
 import { Cache } from 'cache-manager';
 import * as fse from 'fs-extra';
 import { Model } from 'mongoose';
@@ -8,12 +14,6 @@ import { CreateRecipeDto } from './dto/create-recipe.dto';
 import { SearchRecipeDto } from './dto/search-recipe.dto';
 import { UpdateRecipeDto } from './dto/update-recipe.dto';
 import { Recipe } from './entities/recipe.entity';
-import { paginateResults } from '@utils/paginate.utlis';
-import {
-  deleteCacheByKey,
-  generateCacheKey,
-  getDataCache,
-} from '@utils/cache.utils';
 @Injectable()
 export class RecipesService {
   constructor(
@@ -131,7 +131,7 @@ export class RecipesService {
    * @returns Lista de todas las recetas asociada a esa categoria
    * @throws Mensaje que indica que no hay recetas asociadas a esa categoria
    */
-  //!
+
   async getAllRecipesOneCategory(
     categoryId: string,
     page: number,
@@ -158,7 +158,7 @@ export class RecipesService {
     if (recipes.length === 0) {
       return { message: 'No hay recetas en esta categoria' };
     }
-    console.log(recipes.length);
+
     const pageData = {
       page: currentPage,
       totalPages,
@@ -182,7 +182,7 @@ export class RecipesService {
       .populate('country', '-public_id');
 
     if (recipes.length === 0) {
-      return { message: 'No hay recetas en esta categoria' };
+      return { message: 'No hay recetas relacionadas a este pais!' };
     }
     return recipes;
   }
