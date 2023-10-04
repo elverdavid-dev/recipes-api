@@ -25,8 +25,8 @@ export async function uploadImage(filePath: string, folder: string) {
   return await cloudinary.uploader.upload(filePath, {
     folder,
     transformation: {
-      width: '400',
-      height: '300',
+      width: '700',
+      height: '400',
       crop: 'fill',
       quality: '60',
     },
