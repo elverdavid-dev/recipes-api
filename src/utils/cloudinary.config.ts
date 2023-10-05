@@ -26,7 +26,7 @@ export async function uploadImage(filePath: string, folder: string) {
     folder,
     transformation: {
       width: '700',
-      height: '400',
+      height: '500',
       crop: 'fill',
       quality: '60',
     },
