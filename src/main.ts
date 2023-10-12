@@ -15,6 +15,7 @@ async function bootstrap() {
       'API que permite gestionar y explorar recetas de cocina, junto con sus categorías asociadas.',
     )
     .setVersion('1.0')
+    .setContact('Elver David Peñate', 'https://elvportafolio.website', '')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
