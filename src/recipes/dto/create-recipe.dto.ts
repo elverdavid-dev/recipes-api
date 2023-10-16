@@ -4,7 +4,6 @@ import {
   IsArray,
   IsMongoId,
   IsNotEmpty,
-  IsNumber,
   IsOptional,
   IsString,
 } from 'class-validator';
@@ -59,6 +58,12 @@ export class CreateRecipeDto {
       'agregar cuanto tarda una receta en preparase , agregar en minutos',
   })
   duration: number;
+
+  @IsNotEmpty({ message: 'Las porciones son  requerida!' })
+  @ApiProperty({
+    description: 'agregar para cuantas porciones alcanza una receta',
+  })
+  portions: number;
 
   @ApiProperty({
     description:
