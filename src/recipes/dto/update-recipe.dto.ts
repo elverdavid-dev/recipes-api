@@ -1,16 +1,15 @@
 import { PartialType } from '@nestjs/mapped-types';
+import { ApiProperty } from '@nestjs/swagger';
 import {
   ArrayNotEmpty,
   IsArray,
   IsMongoId,
   IsNotEmpty,
-  IsNumber,
   IsOptional,
   IsString,
 } from 'class-validator';
-import { CreateRecipeDto } from './create-recipe.dto';
 import { Types } from 'mongoose';
-import { ApiProperty } from '@nestjs/swagger';
+import { CreateRecipeDto } from './create-recipe.dto';
 
 export class UpdateRecipeDto extends PartialType(CreateRecipeDto) {
   @IsNotEmpty({ message: 'El nombre es requerido!' })
@@ -51,6 +50,12 @@ export class UpdateRecipeDto extends PartialType(CreateRecipeDto) {
 
   @IsNotEmpty({ message: 'La duracion es requerida!' })
   duration?: number;
+
+  @IsNotEmpty({ message: 'Las porciones son  requerida!' })
+  @ApiProperty({
+    description: 'agregar para cuantas porciones alcanza una receta',
+  })
+  portions?: number;
 
   @ApiProperty({
     description:

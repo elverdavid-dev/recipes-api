@@ -27,6 +27,9 @@ export class Recipe {
   duration: number;
 
   @Prop({ required: true })
+  portions: number;
+
+  @Prop({ required: true })
   image: string;
 
   @Prop()
