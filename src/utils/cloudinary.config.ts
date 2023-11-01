@@ -28,7 +28,7 @@ export async function uploadImage(filePath: string, folder: string) {
       width: '700',
       height: '500',
       crop: 'fill',
-      quality: '60',
+      quality: '80',
     },
   });
 }

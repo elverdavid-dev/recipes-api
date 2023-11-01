@@ -120,7 +120,7 @@ export class RecipesService {
       .select('-public_id')
       .sort({ createdAt: -1 });
     if (recipes.length === 0) {
-      return { message: 'No se encontraron recetas con ese nombre.' };
+      return { message: `No se encontraron recetas que coincidan con el nombre ${searchRecipeDto.name}` };
     }
     return recipes;
   }
