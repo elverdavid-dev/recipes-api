@@ -1,7 +1,7 @@
 {
   "name": "recipes-api",
   "version": "1.0",
-  "description": "API que permite gestionar y explorar recetas de cocina, junto con sus categorías asociadas.",
+  "description": "API que permite explora una colección de recetas de cocina de todos los rincones del planeta y más allá. Desde platos regionales auténticos hasta creaciones innovadoras",
   "author": "Elver David Peñate",
   "private": true,
   "license": "UNLICENSED",

@@ -12,7 +12,7 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('Api de recetas V1')
     .setDescription(
-      'API que permite gestionar y explorar recetas de cocina, junto con sus categorías asociadas.',
+      'Bienvenido a la **Recipes API**, explora una colección de recetas de cocina de todos los rincones del planeta y más allá. Desde platos regionales auténticos hasta creaciones innovadoras, comparte y disfruta de la diversidad de la gastronomía global con facilidad.',
     )
     .setVersion('1.0')
     .setContact('Elver David Peñate', 'https://elvportafolio.website', '')
