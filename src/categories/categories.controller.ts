@@ -10,7 +10,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiConsumes, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiConsumes, ApiExcludeEndpoint, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
 import { fileFilter } from 'src/utils/fileUpload';
 import { CategoriesService } from './categories.service';
@@ -53,6 +53,7 @@ export class CategoriesController {
   @Post()
   @ApiOperation({ summary: 'Crear una nueva categoria' })
   @ApiConsumes('multipart/form-data')
+  @ApiExcludeEndpoint()
   @UseInterceptors(
     FileInterceptor('image', {
       storage: diskStorage({
@@ -76,6 +77,7 @@ export class CategoriesController {
   @Put(':id')
   @ApiOperation({ summary: 'Actualizar categoria por id' })
   @ApiConsumes('multipart/form-data')
+  @ApiExcludeEndpoint()
   @ApiParam({
     name: 'id',
     description: 'Id de la categoria que se desea actualizar',
@@ -100,6 +102,7 @@ export class CategoriesController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Eliminar categoria por id' })
+  @ApiExcludeEndpoint()
   @ApiParam({
     name: 'id',
     description: 'Id de la categoria que se desea Eliminar',
