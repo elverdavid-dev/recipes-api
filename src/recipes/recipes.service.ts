@@ -63,6 +63,7 @@ export class RecipesService {
     const recipePageData = {
       page: currentPage,
       totalPages,
+      itemsPerPage: limit,
       totalItems,
       data: listRecipes,
     };
@@ -120,7 +121,9 @@ export class RecipesService {
       .select('-public_id')
       .sort({ createdAt: -1 });
     if (recipes.length === 0) {
-      return { message: `No se encontraron recetas que coincidan con el nombre ${searchRecipeDto.name}` };
+      return {
+        message: `No se encontraron recetas que coincidan con el nombre ${searchRecipeDto.name}`,
+      };
     }
     return recipes;
   }

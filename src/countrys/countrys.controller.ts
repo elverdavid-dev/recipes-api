@@ -1,29 +1,29 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Param,
+  Controller,
   Delete,
-  UseInterceptors,
-  UploadedFile,
+  Get,
+  Param,
+  Post,
   Put,
   Query,
-  ParseIntPipe,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
-import { CountrysService } from './countrys.service';
-import { CreateCountryDto } from './dto/create-country.dto';
-import { UpdateCountryDto } from './dto/update-country.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { fileFilter } from '../utils/fileUpload';
 import {
   ApiConsumes,
+  ApiExcludeEndpoint,
   ApiOperation,
   ApiParam,
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
+import { diskStorage } from 'multer';
+import { fileFilter } from '../utils/fileUpload';
+import { CountrysService } from './countrys.service';
+import { CreateCountryDto } from './dto/create-country.dto';
+import { UpdateCountryDto } from './dto/update-country.dto';
 
 @Controller('countrys')
 @ApiTags('Regiones')
@@ -42,17 +42,16 @@ export class CountrysController {
   @ApiQuery({
     name: 'page',
     description: 'agrega la pagina que se desea ver por ejemplo la pagina 1',
+    required: false,
   })
   @ApiQuery({
     name: 'limit',
     description:
       'limite de regiones por pagina que se desea ver, por ejemplo 5 regiones por paginas',
+    required: false,
   })
   //Controlador
-  findAll(
-    @Query('page', ParseIntPipe) page: number,
-    @Query('limit', ParseIntPipe) limit: number,
-  ) {
+  findAll(@Query('page') page = 1, @Query('limit') limit = 20) {
     return this.countrysService.findAll(page, limit);
   }
 
@@ -90,6 +89,7 @@ export class CountrysController {
       'con este servicio se puede crear una nueva region que puede estar relacionada a una receta , por ejemplo una receta que sea originaria de una región o un pais',
   })
   @ApiConsumes('multipart/form-data')
+  @ApiExcludeEndpoint()
 
   //Controlador
   create(
@@ -120,6 +120,7 @@ export class CountrysController {
     description: 'Id de la region que se desea actualizar',
   })
   @ApiConsumes('multipart/form-data')
+  @ApiExcludeEndpoint()
   //Controlador
   update(
     @Param('id') id: string,
@@ -135,6 +136,7 @@ export class CountrysController {
    */
   @Delete(':id')
   @ApiOperation({ summary: 'Eliminar una region por id' })
+  @ApiExcludeEndpoint()
   @ApiParam({
     name: 'id',
     description: 'Id de la region que se desea eliminar',

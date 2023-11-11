@@ -14,6 +14,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiConsumes,
+  ApiExcludeEndpoint,
   ApiOperation,
   ApiParam,
   ApiQuery,
@@ -41,16 +42,18 @@ export class RecipesController {
   @ApiQuery({
     name: 'page',
     description: 'agrega la pagina que se desea ver por ejemplo la pagina 1',
+    required:false
   })
   @ApiQuery({
     name: 'limit',
     description:
       'limite de recetas por pagina que se desea ver, por ejemplo 10 recetas por paginas',
+      required:false
   })
   //Controlador
   findAll(
-    @Query('page', ParseIntPipe) page: number,
-    @Query('limit', ParseIntPipe) limit: number,
+    @Query('page') page = 1,
+    @Query('limit') limit = 20,
   ) {
     return this.recipesService.findAll(page, limit);
   }
@@ -158,6 +161,7 @@ export class RecipesController {
   //Documentacion
   @ApiOperation({ summary: 'Crear nueva receta' })
   @ApiConsumes('multipart/form-data')
+  @ApiExcludeEndpoint()
   //Controlador
   create(
     @UploadedFile() image: Express.Multer.File,
@@ -184,6 +188,7 @@ export class RecipesController {
     description: 'Puede actualizar una a varias propiedades',
   })
   @ApiConsumes('multipart/form-data')
+  @ApiExcludeEndpoint()
   @ApiParam({
     name: 'id',
     description: 'Id de las receta que se desa actualizar',
@@ -203,6 +208,7 @@ export class RecipesController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Eliminar receta por id' })
+  @ApiExcludeEndpoint()
   @ApiParam({
     name: 'id',
     description: 'Id de la receta que se desea eliminar',

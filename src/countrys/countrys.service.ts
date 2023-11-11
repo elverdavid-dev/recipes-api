@@ -1,11 +1,5 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { CreateCountryDto } from './dto/create-country.dto';
-import { UpdateCountryDto } from './dto/update-country.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Country } from './entities/country.entity';
-import { Model } from 'mongoose';
-import { deleteImage, uploadImage } from 'src/utils/cloudinary.config';
-import * as fse from 'fs-extra';
 import {
   deleteCacheByKey,
   generateCacheKey,
@@ -13,6 +7,12 @@ import {
 } from '@utils/cache.utils';
 import { paginateResults } from '@utils/paginate.utlis';
 import { Cache } from 'cache-manager';
+import * as fse from 'fs-extra';
+import { Model } from 'mongoose';
+import { deleteImage, uploadImage } from 'src/utils/cloudinary.config';
+import { CreateCountryDto } from './dto/create-country.dto';
+import { UpdateCountryDto } from './dto/update-country.dto';
+import { Country } from './entities/country.entity';
 @Injectable()
 export class CountrysService {
   constructor(
@@ -55,6 +55,7 @@ export class CountrysService {
     const pageData = {
       page: currentPage,
       totalPages,
+      itemsPerPage: limit,
       totalItems,
       data: listCountrys,
     };
