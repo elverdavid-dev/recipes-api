@@ -9,23 +9,23 @@ import {
   Put,
   Query,
   UploadedFile,
-  UseInterceptors,
-} from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+  UseInterceptors
+} from '@nestjs/common'
+import { FileInterceptor } from '@nestjs/platform-express'
 import {
   ApiConsumes,
   ApiExcludeEndpoint,
   ApiOperation,
   ApiParam,
   ApiQuery,
-  ApiTags,
-} from '@nestjs/swagger';
-import { diskStorage } from 'multer';
-import { fileFilter } from '../utils/fileUpload';
-import { CreateRecipeDto } from './dto/create-recipe.dto';
-import { SearchRecipeDto } from './dto/search-recipe.dto';
-import { UpdateRecipeDto } from './dto/update-recipe.dto';
-import { RecipesService } from './recipes.service';
+  ApiTags
+} from '@nestjs/swagger'
+import { diskStorage } from 'multer'
+import { fileFilter } from '../utils/fileUpload'
+import { CreateRecipeDto } from './dto/create-recipe.dto'
+import { SearchRecipeDto } from './dto/search-recipe.dto'
+import { UpdateRecipeDto } from './dto/update-recipe.dto'
+import { RecipesService } from './recipes.service'
 
 @ApiTags('Recetas')
 @Controller('recipes')
@@ -42,20 +42,17 @@ export class RecipesController {
   @ApiQuery({
     name: 'page',
     description: 'agrega la pagina que se desea ver por ejemplo la pagina 1',
-    required:false
+    required: false
   })
   @ApiQuery({
     name: 'limit',
     description:
       'limite de recetas por pagina que se desea ver, por ejemplo 10 recetas por paginas',
-      required:false
+    required: false
   })
   //Controlador
-  findAll(
-    @Query('page') page = 1,
-    @Query('limit') limit = 20,
-  ) {
-    return this.recipesService.findAll(page, limit);
+  findAll(@Query('page') page = 1, @Query('limit') limit = 20) {
+    return this.recipesService.findAll(page, limit)
   }
 
   /**
@@ -67,10 +64,10 @@ export class RecipesController {
   @ApiQuery({
     name: 'limit',
     description:
-      'Limite de las ultimas recetas agregada que desea ver por ejemplo las ultimas 10',
+      'Limite de las ultimas recetas agregada que desea ver por ejemplo las ultimas 10'
   })
   getLatestRecipes(@Query('limit', ParseIntPipe) limit: number) {
-    return this.recipesService.getLatestRecipes(limit);
+    return this.recipesService.getLatestRecipes(limit)
   }
 
   /**
@@ -81,10 +78,10 @@ export class RecipesController {
   @ApiOperation({ summary: 'Buscar recetas por nombre' })
   @ApiQuery({
     name: 'name',
-    description: 'Nombre de la receta que se desea buscar',
+    description: 'Nombre de la receta que se desea buscar'
   })
   searchByName(@Query() searchRecipeDto: SearchRecipeDto) {
-    return this.recipesService.searchByName(searchRecipeDto);
+    return this.recipesService.searchByName(searchRecipeDto)
   }
 
   /**
@@ -97,28 +94,24 @@ export class RecipesController {
   @ApiQuery({
     name: 'CategoryId',
     description:
-      'Id de la categoria por la cual desea buscar las recetas relacionadas a esa categoria',
+      'Id de la categoria por la cual desea buscar las recetas relacionadas a esa categoria'
   })
   @ApiQuery({
     name: 'page',
-    description: 'agrega la pagina que se desea ver por ejemplo la pagina 1',
+    description: 'agrega la pagina que se desea ver por ejemplo la pagina 1'
   })
   @ApiQuery({
     name: 'limit',
     description:
-      'limite de recetas por pagina que se desea ver, por ejemplo 10 recetas por paginas',
+      'limite de recetas por pagina que se desea ver, por ejemplo 10 recetas por paginas'
   })
   //Controlador
   getAllRecipesOneCategory(
     @Query('CategoryId') categoryId: string,
     @Query('page', ParseIntPipe) page: number,
-    @Query('limit', ParseIntPipe) limit: number,
+    @Query('limit', ParseIntPipe) limit: number
   ) {
-    return this.recipesService.getAllRecipesOneCategory(
-      categoryId,
-      page,
-      limit,
-    );
+    return this.recipesService.getAllRecipesOneCategory(categoryId, page, limit)
   }
 
   /**
@@ -130,10 +123,10 @@ export class RecipesController {
   @ApiQuery({
     name: 'countryId',
     description:
-      'Id de la región por la cual desea buscar las recetas relacionadas a esa región',
+      'Id de la región por la cual desea buscar las recetas relacionadas a esa región'
   })
   getAllRecipesOneCountry(@Query('countryId') countryId: string) {
-    return this.recipesService.getAllRecipesOneCountry(countryId);
+    return this.recipesService.getAllRecipesOneCountry(countryId)
   }
   /**
    * @description Controlador de el servicio de obtener una receta por el id.
@@ -143,7 +136,7 @@ export class RecipesController {
   @ApiOperation({ summary: 'Obtener receta por id' })
   @ApiParam({ name: 'id', description: 'Id de la receta que se desea buscar' })
   findOne(@Param('id') id: string) {
-    return this.recipesService.findOne(id);
+    return this.recipesService.findOne(id)
   }
 
   /**
@@ -155,8 +148,8 @@ export class RecipesController {
   @UseInterceptors(
     FileInterceptor('image', {
       storage: diskStorage({ destination: './upload' }),
-      fileFilter,
-    }),
+      fileFilter
+    })
   )
   //Documentacion
   @ApiOperation({ summary: 'Crear nueva receta' })
@@ -165,9 +158,9 @@ export class RecipesController {
   //Controlador
   create(
     @UploadedFile() image: Express.Multer.File,
-    @Body() createRecipeDto: CreateRecipeDto,
+    @Body() createRecipeDto: CreateRecipeDto
   ) {
-    return this.recipesService.create(createRecipeDto, image);
+    return this.recipesService.create(createRecipeDto, image)
   }
 
   /**
@@ -179,27 +172,27 @@ export class RecipesController {
   @UseInterceptors(
     FileInterceptor('image', {
       storage: diskStorage({ destination: './upload' }),
-      fileFilter,
-    }),
+      fileFilter
+    })
   )
   //Documentacion
   @ApiOperation({
     summary: 'Actualizar receta por id',
-    description: 'Puede actualizar una a varias propiedades',
+    description: 'Puede actualizar una a varias propiedades'
   })
   @ApiConsumes('multipart/form-data')
   @ApiExcludeEndpoint()
   @ApiParam({
     name: 'id',
-    description: 'Id de las receta que se desa actualizar',
+    description: 'Id de las receta que se desa actualizar'
   })
   //Controlador
   update(
     @Param('id') id: string,
     @Body() updateRecipeDto: UpdateRecipeDto,
-    @UploadedFile() image: Express.Multer.File,
+    @UploadedFile() image: Express.Multer.File
   ) {
-    return this.recipesService.update(id, updateRecipeDto, image);
+    return this.recipesService.update(id, updateRecipeDto, image)
   }
 
   /**
@@ -211,9 +204,9 @@ export class RecipesController {
   @ApiExcludeEndpoint()
   @ApiParam({
     name: 'id',
-    description: 'Id de la receta que se desea eliminar',
+    description: 'Id de la receta que se desea eliminar'
   })
   remove(@Param('id') id: string) {
-    return this.recipesService.remove(id);
+    return this.recipesService.remove(id)
   }
 }

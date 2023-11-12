@@ -1,15 +1,15 @@
-import { Schema, SchemaFactory, Prop } from '@nestjs/mongoose';
+import { Schema, SchemaFactory, Prop } from '@nestjs/mongoose'
 
 @Schema({ versionKey: false })
 export class Country {
   @Prop({ required: true })
-  name: string;
+  name: string
 
   @Prop({ required: true })
-  image: string;
+  image: string
 
   @Prop()
-  public_id: string;
+  public_id: string
 }
 
-export const CountryEntity = SchemaFactory.createForClass(Country);
+export const CountryEntity = SchemaFactory.createForClass(Country)

@@ -7,15 +7,21 @@ import {
   Post,
   Put,
   UploadedFile,
-  UseInterceptors,
-} from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiConsumes, ApiExcludeEndpoint, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
-import { diskStorage } from 'multer';
-import { fileFilter } from 'src/utils/fileUpload';
-import { CategoriesService } from './categories.service';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
+  UseInterceptors
+} from '@nestjs/common'
+import { FileInterceptor } from '@nestjs/platform-express'
+import {
+  ApiConsumes,
+  ApiExcludeEndpoint,
+  ApiOperation,
+  ApiParam,
+  ApiTags
+} from '@nestjs/swagger'
+import { diskStorage } from 'multer'
+import { fileFilter } from 'src/utils/fileUpload'
+import { CategoriesService } from './categories.service'
+import { CreateCategoryDto } from './dto/create-category.dto'
+import { UpdateCategoryDto } from './dto/update-category.dto'
 
 @ApiTags('Categorias')
 @Controller('categories')
@@ -29,7 +35,7 @@ export class CategoriesController {
   @Get()
   @ApiOperation({ summary: 'Obtener todas las categorias' })
   findAll() {
-    return this.categoriesService.findAll();
+    return this.categoriesService.findAll()
   }
 
   /**
@@ -40,10 +46,10 @@ export class CategoriesController {
   @ApiOperation({ summary: 'Obtener categoria por id' })
   @ApiParam({
     name: 'id',
-    description: 'Id de la categoria que se desea obtener por id',
+    description: 'Id de la categoria que se desea obtener por id'
   })
   findOne(@Param('id') id: string) {
-    return this.categoriesService.findOne(id);
+    return this.categoriesService.findOne(id)
   }
 
   /**
@@ -57,17 +63,17 @@ export class CategoriesController {
   @UseInterceptors(
     FileInterceptor('image', {
       storage: diskStorage({
-        destination: './upload',
+        destination: './upload'
       }),
-      fileFilter,
-    }),
+      fileFilter
+    })
   )
   create(
     @Body() createCategoryDto: CreateCategoryDto,
     @UploadedFile()
-    image: Express.Multer.File,
+    image: Express.Multer.File
   ) {
-    return this.categoriesService.create(createCategoryDto, image);
+    return this.categoriesService.create(createCategoryDto, image)
   }
 
   /**
@@ -80,20 +86,20 @@ export class CategoriesController {
   @ApiExcludeEndpoint()
   @ApiParam({
     name: 'id',
-    description: 'Id de la categoria que se desea actualizar',
+    description: 'Id de la categoria que se desea actualizar'
   })
   @UseInterceptors(
     FileInterceptor('image', {
       storage: diskStorage({ destination: './upload' }),
-      fileFilter,
-    }),
+      fileFilter
+    })
   )
   update(
     @Param('id') id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
-    @UploadedFile() image: Express.Multer.File,
+    @UploadedFile() image: Express.Multer.File
   ) {
-    return this.categoriesService.update(id, updateCategoryDto, image);
+    return this.categoriesService.update(id, updateCategoryDto, image)
   }
 
   /**
@@ -105,9 +111,9 @@ export class CategoriesController {
   @ApiExcludeEndpoint()
   @ApiParam({
     name: 'id',
-    description: 'Id de la categoria que se desea Eliminar',
+    description: 'Id de la categoria que se desea Eliminar'
   })
   remove(@Param('id') id: string) {
-    return this.categoriesService.remove(id);
+    return this.categoriesService.remove(id)
   }
 }
