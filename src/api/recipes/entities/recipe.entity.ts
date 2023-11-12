@@ -1,8 +1,8 @@
 //eslint-disable-next-line prettier/prettier
+import { Category } from '@/api/categories/entities/category.entity'
+import { Country } from '@/api/countrys/entities/country.entity'
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import mongoose from 'mongoose'
-import { Category } from 'src/categories/entities/category.entity'
-import { Country } from 'src/countrys/entities/country.entity'
 @Schema({ timestamps: true, versionKey: false })
 export class Recipe {
   @Prop({ trim: true, lowercase: true, required: true })

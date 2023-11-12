@@ -19,8 +19,8 @@ import {
   ApiQuery,
   ApiTags
 } from '@nestjs/swagger'
+import { fileFilter } from '@utils/fileUpload'
 import { diskStorage } from 'multer'
-import { fileFilter } from '../utils/fileUpload'
 import { CountrysService } from './countrys.service'
 import { CreateCountryDto } from './dto/create-country.dto'
 import { UpdateCountryDto } from './dto/update-country.dto'

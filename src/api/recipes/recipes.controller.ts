@@ -20,8 +20,8 @@ import {
   ApiQuery,
   ApiTags
 } from '@nestjs/swagger'
+import { fileFilter } from '@utils/fileUpload'
 import { diskStorage } from 'multer'
-import { fileFilter } from '../utils/fileUpload'
 import { CreateRecipeDto } from './dto/create-recipe.dto'
 import { SearchRecipeDto } from './dto/search-recipe.dto'
 import { UpdateRecipeDto } from './dto/update-recipe.dto'

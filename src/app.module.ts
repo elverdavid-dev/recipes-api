@@ -1,10 +1,10 @@
+import { CategoriesModule } from '@/api/categories/categories.module'
+import { CountrysModule } from '@/api/countrys/countrys.module'
+import { RecipesModule } from '@/api/recipes/recipes.module'
 import { CacheModule } from '@nestjs/cache-manager'
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { MongooseModule } from '@nestjs/mongoose'
-import { CategoriesModule } from './categories/categories.module'
-import { CountrysModule } from './countrys/countrys.module'
-import { RecipesModule } from './recipes/recipes.module'
 import { CloudinaryConfigProvider } from './utils/cloudinary.config'
 
 @Module({

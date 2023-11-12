@@ -13,6 +13,9 @@
     "paths": {
       "@utils/*": [
         "./src/utils/*"
+      ],
+      "@/*": [
+        "./src/*"
       ]
     },
     "incremental": true,
