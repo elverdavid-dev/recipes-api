@@ -1,27 +1,27 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common'
+import { InjectModel } from '@nestjs/mongoose'
 import {
   deleteCacheByKey,
   generateCacheKey,
-  getDataCache,
-} from '@utils/cache.utils';
-import { paginateResults } from '@utils/paginate.utlis';
-import { Cache } from 'cache-manager';
-import * as fse from 'fs-extra';
-import { Model } from 'mongoose';
-import { deleteImage, uploadImage } from 'src/utils/cloudinary.config';
-import { CreateRecipeDto } from './dto/create-recipe.dto';
-import { SearchRecipeDto } from './dto/search-recipe.dto';
-import { UpdateRecipeDto } from './dto/update-recipe.dto';
-import { Recipe } from './entities/recipe.entity';
+  getDataCache
+} from '@utils/cache.utils'
+import { paginateResults } from '@utils/paginate.utlis'
+import { Cache } from 'cache-manager'
+import * as fse from 'fs-extra'
+import { Model } from 'mongoose'
+import { deleteImage, uploadImage } from 'src/utils/cloudinary.config'
+import { CreateRecipeDto } from './dto/create-recipe.dto'
+import { SearchRecipeDto } from './dto/search-recipe.dto'
+import { UpdateRecipeDto } from './dto/update-recipe.dto'
+import { Recipe } from './entities/recipe.entity'
 @Injectable()
 export class RecipesService {
   constructor(
     @InjectModel(Recipe.name) private RecipeEntity: Model<Recipe>,
-    @Inject('CACHE_MANAGER') private cacheManager: Cache,
+    @Inject('CACHE_MANAGER') private cacheManager: Cache
   ) {}
 
-  private cacheKey = '';
+  private cacheKey = ''
 
   /**
    * Servicio para obtener todas las recetas
@@ -30,25 +30,25 @@ export class RecipesService {
    * @returns Lista de las recetas
    * @throws {HttpException} Si la pagina no existe o es menor o igual a 0
    */
-  async findAll(page: number, limit: number) {
+  async findAll(page = 1, limit = 20) {
     //Generar cacheKey
-    this.cacheKey = generateCacheKey(page, limit);
+    this.cacheKey = generateCacheKey(page, limit)
 
     //Obtener las recetas de la cache si existe
-    const cacheData = await getDataCache(this.cacheManager, this.cacheKey);
+    const cacheData = await getDataCache(this.cacheManager, this.cacheKey)
 
     //Obtener el total de recetas agregadas a la DB
-    const totalRecipes = await this.RecipeEntity.countDocuments();
+    const totalRecipes = await this.RecipeEntity.countDocuments()
 
     const { currentPage, totalItems, totalPages, skip } = paginateResults(
       totalRecipes,
       page,
-      limit,
-    );
+      limit
+    )
 
     //si los datos existen en cache entonces los retorna
     if (cacheData) {
-      return cacheData;
+      return cacheData
     }
 
     //Si no hay datos en cache entoce se agregan
@@ -58,18 +58,18 @@ export class RecipesService {
       .populate('category', '-public_id')
       .populate('country', '-public_id')
       .select('-public_id')
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
 
     const recipePageData = {
       page: currentPage,
       totalPages,
       itemsPerPage: limit,
       totalItems,
-      data: listRecipes,
-    };
-    await this.cacheManager.set(this.cacheKey, recipePageData);
+      data: listRecipes
+    }
+    await this.cacheManager.set(this.cacheKey, recipePageData)
 
-    return recipePageData;
+    return recipePageData
   }
 
   /**
@@ -83,14 +83,14 @@ export class RecipesService {
     const recipe = await this.RecipeEntity.findById(id)
       .populate('category', '-public_id')
       .populate('country', '-public_id')
-      .select('-public_id');
+      .select('-public_id')
 
     //Si la receta no existe entonces error 404
     if (!recipe) {
-      throw new HttpException('La receta no existe!', HttpStatus.NOT_FOUND);
+      throw new HttpException('La receta no existe!', HttpStatus.NOT_FOUND)
     }
 
-    return recipe;
+    return recipe
   }
 
   /**
@@ -103,7 +103,7 @@ export class RecipesService {
       .sort({ createdAt: -1 })
       .populate('category', '-public_id')
       .populate('country', '-public_id')
-      .select('-public_id');
+      .select('-public_id')
   }
 
   /**
@@ -113,19 +113,19 @@ export class RecipesService {
    * @throws Mensaje que indica que no hay recetas relacionadas con el nombre buscado
    */
   async searchByName(searchRecipeDto: SearchRecipeDto) {
-    const query = { name: { $regex: searchRecipeDto.name, $options: 'i' } };
+    const query = { name: { $regex: searchRecipeDto.name, $options: 'i' } }
 
     const recipes = await this.RecipeEntity.find(query)
       .populate('category', '-public_id')
       .populate('country', '-public_id')
       .select('-public_id')
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
     if (recipes.length === 0) {
       return {
-        message: `No se encontraron recetas que coincidan con el nombre ${searchRecipeDto.name}`,
-      };
+        message: `No se encontraron recetas que coincidan con el nombre ${searchRecipeDto.name}`
+      }
     }
-    return recipes;
+    return recipes
   }
 
   /**
@@ -138,37 +138,38 @@ export class RecipesService {
   async getAllRecipesOneCategory(
     categoryId: string,
     page: number,
-    limit: number,
+    limit: number
   ) {
     const totalRecipes = await this.RecipeEntity.countDocuments({
-      category: categoryId,
-    });
+      category: categoryId
+    })
     const { currentPage, skip, totalItems, totalPages } = paginateResults(
       totalRecipes,
       page,
-      limit,
-    );
+      limit
+    )
 
     const recipes = await this.RecipeEntity.find({
-      category: categoryId,
+      category: categoryId
     })
       .skip(skip)
       .limit(limit)
       .select('-public_id')
       .populate('category', '-public_id')
-      .populate('country', '-public_id');
+      .populate('country', '-public_id')
 
     if (recipes.length === 0) {
-      return { message: 'No hay recetas en esta categoria' };
+      return { message: 'No hay recetas en esta categoria' }
     }
 
     const pageData = {
       page: currentPage,
       totalPages,
+      itemsPerPage: limit,
       totalItems,
-      data: recipes,
-    };
-    return pageData;
+      data: recipes
+    }
+    return pageData
   }
 
   /**
@@ -182,12 +183,12 @@ export class RecipesService {
     const recipes = await this.RecipeEntity.find({ country: countryId })
       .select('-public_id')
       .populate('category', '-public_id')
-      .populate('country', '-public_id');
+      .populate('country', '-public_id')
 
     if (recipes.length === 0) {
-      return { message: 'No hay recetas relacionadas a este pais!' };
+      return { message: 'No hay recetas relacionadas a este pais!' }
     }
-    return recipes;
+    return recipes
   }
   /**
    * Servicio para crea una nueva receta con los detalles proporcionados y la imagen asociada.
@@ -200,32 +201,32 @@ export class RecipesService {
     try {
       //Eliminar la cache
       if (this.cacheKey) {
-        await deleteCacheByKey(this.cacheManager, this.cacheKey);
-        this.cacheKey = '';
+        await deleteCacheByKey(this.cacheManager, this.cacheKey)
+        this.cacheKey = ''
       }
       //subir imagen a cloudinary y eliminarla de la carpeta upload
-      const cloudinaryResponse = await uploadImage(image.path, 'recipes');
-      await fse.unlink(image.path);
+      const cloudinaryResponse = await uploadImage(image.path, 'recipes')
+      await fse.unlink(image.path)
       //crear la receta y guardarla en la DB
       const newRecipe = new this.RecipeEntity({
         ...createRecipeDto,
         image: cloudinaryResponse.secure_url,
-        public_id: cloudinaryResponse.public_id,
-      });
-      newRecipe.save();
+        public_id: cloudinaryResponse.public_id
+      })
+      newRecipe.save()
 
       return {
         message: 'Receta creada correctamente',
-        name: createRecipeDto.name,
-      };
+        name: createRecipeDto.name
+      }
     } catch (error) {
-      console.log(error);
-      await fse.unlink(image.path);
+      console.log(error)
+      await fse.unlink(image.path)
 
       throw new HttpException(
         'Error al crear la receta',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+        HttpStatus.INTERNAL_SERVER_ERROR
+      )
     }
   }
 
@@ -240,33 +241,33 @@ export class RecipesService {
   async update(
     id: string,
     updateRecipeDto: UpdateRecipeDto,
-    image: Express.Multer.File,
+    image: Express.Multer.File
   ) {
     //Si la recetas no existe error 404
-    const recipeFound = await this.RecipeEntity.findById(id);
+    const recipeFound = await this.RecipeEntity.findById(id)
     if (!recipeFound) {
-      throw new HttpException('La receta no existe!', HttpStatus.NOT_FOUND);
+      throw new HttpException('La receta no existe!', HttpStatus.NOT_FOUND)
     }
     //Eliminar cache
     if (this.cacheKey) {
-      await deleteCacheByKey(this.cacheManager, this.cacheKey);
-      this.cacheKey = '';
+      await deleteCacheByKey(this.cacheManager, this.cacheKey)
+      this.cacheKey = ''
     }
     //actualizar la imagen
     if (image) {
-      await deleteImage(recipeFound.public_id);
-      const newImage = await uploadImage(image.path, 'recipes');
-      await fse.unlink(image.path);
-      updateRecipeDto.image = newImage.secure_url;
-      updateRecipeDto.public_id = newImage.public_id;
+      await deleteImage(recipeFound.public_id)
+      const newImage = await uploadImage(image.path, 'recipes')
+      await fse.unlink(image.path)
+      updateRecipeDto.image = newImage.secure_url
+      updateRecipeDto.public_id = newImage.public_id
     }
     //receta actualizada
-    await this.RecipeEntity.findByIdAndUpdate(id, updateRecipeDto);
+    await this.RecipeEntity.findByIdAndUpdate(id, updateRecipeDto)
 
     return {
       message: 'Receta actualizada correctamente',
-      name: updateRecipeDto.name,
-    };
+      name: updateRecipeDto.name
+    }
   }
 
   /**
@@ -277,22 +278,22 @@ export class RecipesService {
    */
   async remove(id: string) {
     //Si la receta no existe error 404
-    const recipeFound = await this.RecipeEntity.findById(id);
+    const recipeFound = await this.RecipeEntity.findById(id)
     if (!recipeFound) {
-      throw new HttpException('La receta no existe!', HttpStatus.NOT_FOUND);
+      throw new HttpException('La receta no existe!', HttpStatus.NOT_FOUND)
     }
     //Eliminar cache
     if (this.cacheKey) {
-      await deleteCacheByKey(this.cacheManager, this.cacheKey);
+      await deleteCacheByKey(this.cacheManager, this.cacheKey)
 
-      this.cacheKey = '';
+      this.cacheKey = ''
     }
     //Eliminar receta y eliminar imagen de cloudinary
-    await deleteImage(recipeFound.public_id);
-    await this.RecipeEntity.findByIdAndDelete(id);
+    await deleteImage(recipeFound.public_id)
+    await this.RecipeEntity.findByIdAndDelete(id)
     return {
       message: 'Receta eliminada correctamente',
-      name: recipeFound.name,
-    };
+      name: recipeFound.name
+    }
   }
 }

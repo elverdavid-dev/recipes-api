@@ -1,11 +1,11 @@
-import { CacheModule } from '@nestjs/cache-manager';
-import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { MongooseModule } from '@nestjs/mongoose';
-import { CategoriesModule } from './categories/categories.module';
-import { RecipesModule } from './recipes/recipes.module';
-import { CloudinaryConfigProvider } from './utils/cloudinary.config';
-import { CountrysModule } from './countrys/countrys.module';
+import { CategoriesModule } from '@/api/categories/categories.module'
+import { CountrysModule } from '@/api/countrys/countrys.module'
+import { RecipesModule } from '@/api/recipes/recipes.module'
+import { CacheModule } from '@nestjs/cache-manager'
+import { Module } from '@nestjs/common'
+import { ConfigModule } from '@nestjs/config'
+import { MongooseModule } from '@nestjs/mongoose'
+import { CloudinaryConfigProvider } from './utils/cloudinary.config'
 
 @Module({
   imports: [
@@ -14,9 +14,9 @@ import { CountrysModule } from './countrys/countrys.module';
     CacheModule.register({ isGlobal: true, ttl: 60000, store: 'memory' }),
     RecipesModule,
     CategoriesModule,
-    CountrysModule,
+    CountrysModule
   ],
   controllers: [],
-  providers: [CloudinaryConfigProvider],
+  providers: [CloudinaryConfigProvider]
 })
 export class AppModule {}
