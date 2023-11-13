@@ -51,8 +51,16 @@ export class CountrysController {
     required: false
   })
   //Controlador
-  findAll(@Query('page') page = 1, @Query('limit') limit = 20) {
-    return this.countrysService.findAll(page, limit)
+  findAll(
+    @Query('page') page: string | number = 1,
+    @Query('limit') limit: string | number = 20
+  ) {
+    // Si no se pasan las consultas, se utilizan los valores por defecto que son de tipo number.
+    // En caso de que se pasen las consultas, los valores son de tipo string y se convierten a number.
+    const pageNumber = typeof page === 'string' ? parseInt(page, 10) : page
+    const limitNumber = typeof limit === 'string' ? parseInt(limit, 10) : limit
+
+    return this.countrysService.findAll(pageNumber, limitNumber)
   }
 
   /**

@@ -165,6 +165,7 @@ export class RecipesService {
     const pageData = {
       page: currentPage,
       totalPages,
+      itemsPerPage: limit,
       totalItems,
       data: recipes
     }

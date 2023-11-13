@@ -51,8 +51,16 @@ export class RecipesController {
     required: false
   })
   //Controlador
-  findAll(@Query('page') page = 1, @Query('limit') limit = 20) {
-    return this.recipesService.findAll(page, limit)
+  findAll(
+    @Query('page') page: string | number = 1,
+    @Query('limit') limit: string | number = 20
+  ) {
+    // Si no se pasan las consultas, se utilizan los valores por defecto que son de tipo number.
+    // En caso de que se pasen las consultas, los valores son de tipo string y se convierten a number.
+    const pageNumber = typeof page === 'string' ? parseInt(page, 10) : page
+    const limitNumber = typeof limit === 'string' ? parseInt(limit, 10) : limit
+
+    return this.recipesService.findAll(pageNumber, limitNumber)
   }
 
   /**
@@ -98,20 +106,31 @@ export class RecipesController {
   })
   @ApiQuery({
     name: 'page',
-    description: 'agrega la pagina que se desea ver por ejemplo la pagina 1'
+    description: 'agrega la pagina que se desea ver por ejemplo la pagina 1',
+    required: false
   })
   @ApiQuery({
     name: 'limit',
     description:
-      'limite de recetas por pagina que se desea ver, por ejemplo 10 recetas por paginas'
+      'limite de recetas por pagina que se desea ver, por ejemplo 10 recetas por paginas',
+    required: false
   })
   //Controlador
   getAllRecipesOneCategory(
     @Query('CategoryId') categoryId: string,
-    @Query('page', ParseIntPipe) page: number,
-    @Query('limit', ParseIntPipe) limit: number
+    @Query('page') page: string | number = 1,
+    @Query('limit') limit: string | number = 20
   ) {
-    return this.recipesService.getAllRecipesOneCategory(categoryId, page, limit)
+    // Si no se pasan las consultas, se utilizan los valores por defecto que son de tipo number.
+    // En caso de que se pasen las consultas, los valores son de tipo string y se convierten a number.
+    const pageNumber = typeof page === 'string' ? parseInt(page, 10) : page
+    const limitNumber = typeof limit === 'string' ? parseInt(limit, 10) : limit
+
+    return this.recipesService.getAllRecipesOneCategory(
+      categoryId,
+      pageNumber,
+      limitNumber
+    )
   }
 
   /**
