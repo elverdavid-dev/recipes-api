@@ -5,7 +5,7 @@ import { CacheModule } from '@nestjs/cache-manager'
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { MongooseModule } from '@nestjs/mongoose'
-import { CloudinaryConfigProvider } from './utils/cloudinary.config'
+import { CloudinaryConfigProvider } from './config/cloudinary.config'
 
 @Module({
   imports: [

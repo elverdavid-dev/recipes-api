@@ -1,3 +1,4 @@
+import { deleteImage, uploadImage } from '@/config/cloudinary.config'
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import {
@@ -9,7 +10,6 @@ import { paginateResults } from '@utils/paginate.utlis'
 import { Cache } from 'cache-manager'
 import * as fse from 'fs-extra'
 import { Model } from 'mongoose'
-import { deleteImage, uploadImage } from 'src/utils/cloudinary.config'
 import { CreateCountryDto } from './dto/create-country.dto'
 import { UpdateCountryDto } from './dto/update-country.dto'
 import { Country } from './entities/country.entity'
@@ -55,7 +55,7 @@ export class CountrysService {
     const pageData = {
       page: currentPage,
       totalPages,
-      itemsPerPage: limit,
+      itemsPerPage: listCountrys.length,
       totalItems,
       data: listCountrys
     }
