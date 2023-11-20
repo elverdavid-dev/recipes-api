@@ -1,3 +1,4 @@
+import { deleteImage, uploadImage } from '@/config/cloudinary.config'
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import {
@@ -9,7 +10,6 @@ import { paginateResults } from '@utils/paginate.utlis'
 import { Cache } from 'cache-manager'
 import * as fse from 'fs-extra'
 import { Model } from 'mongoose'
-import { deleteImage, uploadImage } from 'src/utils/cloudinary.config'
 import { CreateRecipeDto } from './dto/create-recipe.dto'
 import { SearchRecipeDto } from './dto/search-recipe.dto'
 import { UpdateRecipeDto } from './dto/update-recipe.dto'
@@ -24,7 +24,7 @@ export class RecipesService {
   private cacheKey = ''
 
   /**
-   * Servicio para obtener todas las recetas
+   * @description Servicio para obtener todas las recetas
    * @param page - pagina actual
    * @param limit - catidad de recetas por pagina
    * @returns Lista de las recetas
@@ -63,7 +63,7 @@ export class RecipesService {
     const recipePageData = {
       page: currentPage,
       totalPages,
-      itemsPerPage: limit,
+      itemsPerPage: listRecipes.length,
       totalItems,
       data: listRecipes
     }
@@ -73,7 +73,7 @@ export class RecipesService {
   }
 
   /**
-   * Servicio para obtener receta por id
+   * @description Servicio para obtener receta por id
    * @param id - Id de la receta que se desea buscar
    * @returns Receta especifica buscada
    * @throws {HttpException} si la receta no existe
@@ -94,7 +94,7 @@ export class RecipesService {
   }
 
   /**
-   * obtener las ultimas recetas agregadas
+   * @description obtener las ultimas recetas agregadas
    * @returns Lista de las ultimas  recetas
    */
   async getLatestRecipes(limit: number) {
@@ -107,7 +107,7 @@ export class RecipesService {
   }
 
   /**
-   * Servicio para buscar receta por nombre
+   * @description Servicio para buscar receta por nombre
    * @param name - Nombre de la receta que desea buscar
    * @returns Lista de recetas que tengan el nombre buscado
    * @throws Mensaje que indica que no hay recetas relacionadas con el nombre buscado
@@ -129,7 +129,7 @@ export class RecipesService {
   }
 
   /**
-   *  Servicio para obtener o filtrar todas las recetas de una categoría específica.
+   * @description Servicio para obtener o filtrar todas las recetas de una categoría específica.
    * @param categoryId - ID de la categoría por la cual deseas filtrar las recetas.
    * @returns Lista de todas las recetas asociada a esa categoria
    * @throws Mensaje que indica que no hay recetas asociadas a esa categoria
@@ -157,6 +157,7 @@ export class RecipesService {
       .select('-public_id')
       .populate('category', '-public_id')
       .populate('country', '-public_id')
+      .sort({ createdAt: -1 })
 
     if (recipes.length === 0) {
       return { message: 'No hay recetas en esta categoria' }
@@ -165,7 +166,7 @@ export class RecipesService {
     const pageData = {
       page: currentPage,
       totalPages,
-      itemsPerPage: limit,
+      itemsPerPage: recipes.length,
       totalItems,
       data: recipes
     }
