@@ -11,7 +11,6 @@ import { Cache } from 'cache-manager'
 import * as fse from 'fs-extra'
 import { Model } from 'mongoose'
 import { CreateRecipeDto } from './dto/create-recipe.dto'
-import { SearchRecipeDto } from './dto/search-recipe.dto'
 import { UpdateRecipeDto } from './dto/update-recipe.dto'
 import { Recipe } from './entities/recipe.entity'
 
@@ -113,23 +112,17 @@ export class RecipesService {
    * @returns Lista de recetas que tengan el nombre buscado
    * @throws Mensaje que indica que no hay recetas relacionadas con el nombre buscado
    */
-  async searchByName(
-    searchRecipeDto: SearchRecipeDto,
-    page: number,
-    limit: number
-  ) {
-    const query = { name: { $regex: searchRecipeDto.name, $options: 'i' } }
+  async searchByName(name: string, page: number, limit: number) {
+    const query = { name: { $regex: name, $options: 'i' } }
 
     const totalRecipes = await this.RecipeEntity.countDocuments({
-      name: searchRecipeDto.name
+      name: { $regex: name, $options: 'i' }
     })
-
     const { currentPage, totalItems, totalPages, skip } = paginateResults(
       totalRecipes,
       page,
       limit
     )
-
     const recipes = await this.RecipeEntity.find(query)
       .skip(skip)
       .limit(limit)
@@ -139,10 +132,9 @@ export class RecipesService {
       .sort({ createdAt: -1 })
     if (recipes.length === 0) {
       return {
-        message: `No se encontraron recetas que coincidan con el nombre ${searchRecipeDto.name}`
+        message: `No se encontraron recetas que coincidan con el nombre ${name}`
       }
     }
-
     const recipePageData = {
       page: currentPage,
       totalPages,
