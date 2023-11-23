@@ -23,7 +23,6 @@ import {
 import { fileFilter } from '@utils/fileUpload'
 import { diskStorage } from 'multer'
 import { CreateRecipeDto } from './dto/create-recipe.dto'
-import { SearchRecipeDto } from './dto/search-recipe.dto'
 import { UpdateRecipeDto } from './dto/update-recipe.dto'
 import { RecipesService } from './recipes.service'
 
@@ -102,7 +101,7 @@ export class RecipesController {
     required: false
   })
   searchByName(
-    @Query() searchRecipeDto: SearchRecipeDto,
+    @Query('name') name: string,
     @Query('page') page: number | string = 1,
     @Query('limit') limit: number | string = 20
   ) {
@@ -110,12 +109,8 @@ export class RecipesController {
     // En caso de que se pasen las consultas, los valores son de tipo string y se convierten a number.
     const pageNumber = typeof page === 'string' ? parseInt(page, 10) : page
     const limitNumber = typeof limit === 'string' ? parseInt(limit, 10) : limit
-
-    return this.recipesService.searchByName(
-      searchRecipeDto,
-      pageNumber,
-      limitNumber
-    )
+    console.log(name)
+    return this.recipesService.searchByName(name, pageNumber, limitNumber)
   }
 
   /**
