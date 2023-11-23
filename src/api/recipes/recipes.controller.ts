@@ -41,13 +41,14 @@ export class RecipesController {
   @ApiOperation({ summary: 'Obtener todas las recetas' })
   @ApiQuery({
     name: 'page',
-    description: 'agrega la pagina que se desea ver por ejemplo la pagina 1',
+    description:
+      'agrega la pagina que se desea ver por ejemplo la pagina 1, por defecto es 1',
     required: false
   })
   @ApiQuery({
     name: 'limit',
     description:
-      'limite de recetas por pagina que se desea ver, por ejemplo 10 recetas por paginas',
+      'limite de recetas por pagina que se desea ver, por ejemplo 10 recetas por paginas, por defecto es 20',
     required: false
   })
   //Controlador
@@ -88,8 +89,33 @@ export class RecipesController {
     name: 'name',
     description: 'Nombre de la receta que se desea buscar'
   })
-  searchByName(@Query() searchRecipeDto: SearchRecipeDto) {
-    return this.recipesService.searchByName(searchRecipeDto)
+  @ApiQuery({
+    name: 'page',
+    description:
+      'agrega la pagina que se desea ver por ejemplo la pagina 1 , por defecto es 1',
+    required: false
+  })
+  @ApiQuery({
+    name: 'limit',
+    description:
+      'limite de recetas por pagina que se desea ver, por ejemplo 10 recetas por paginas, por defecto 20',
+    required: false
+  })
+  searchByName(
+    @Query() searchRecipeDto: SearchRecipeDto,
+    @Query('page') page: number | string = 1,
+    @Query('limit') limit: number | string = 20
+  ) {
+    // Si no se pasan las consultas, se utilizan los valores por defecto que son de tipo number.
+    // En caso de que se pasen las consultas, los valores son de tipo string y se convierten a number.
+    const pageNumber = typeof page === 'string' ? parseInt(page, 10) : page
+    const limitNumber = typeof limit === 'string' ? parseInt(limit, 10) : limit
+
+    return this.recipesService.searchByName(
+      searchRecipeDto,
+      pageNumber,
+      limitNumber
+    )
   }
 
   /**
@@ -106,13 +132,14 @@ export class RecipesController {
   })
   @ApiQuery({
     name: 'page',
-    description: 'agrega la pagina que se desea ver por ejemplo la pagina 1',
+    description:
+      'agrega la pagina que se desea ver por ejemplo la pagina 1, por defecto es 1',
     required: false
   })
   @ApiQuery({
     name: 'limit',
     description:
-      'limite de recetas por pagina que se desea ver, por ejemplo 10 recetas por paginas',
+      'limite de recetas por pagina que se desea ver, por ejemplo 10 recetas por paginas, por defecto es 20',
     required: false
   })
   //Controlador

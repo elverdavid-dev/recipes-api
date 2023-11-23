@@ -82,8 +82,7 @@ export class CategoriesService {
       await deleteCacheByKey(this.cacheManager, this.cacheKey)
 
       return {
-        message: 'Categoria creada correctamente',
-        name: createCategoryDto.name
+        message: `Categoria ${createCategoryDto.name} creada correctamente`
       }
     } catch (error) {
       throw new HttpException(
@@ -126,8 +125,7 @@ export class CategoriesService {
       await this.CategoryEntity.findByIdAndUpdate(id, updateCategoryDto)
 
       return {
-        message: 'Categoria actualizada correctamente',
-        name: updateCategoryDto.name
+        message: `Categoria ${updateCategoryDto.name} actualizada correctamente`
       }
     } catch (error) {
       console.log(error)
@@ -152,8 +150,7 @@ export class CategoriesService {
     await deleteImage(categoryFound.public_id)
     await this.CategoryEntity.findByIdAndDelete(id)
     return {
-      message: 'Categoria eliminada correctamente',
-      name: categoryFound.name
+      message: `Categoria ${categoryFound.name} eliminada correctamente`
     }
   }
 }
