@@ -102,8 +102,7 @@ export class CountrysService {
       })
       newCountry.save()
       return {
-        message: 'Region creada correctamente',
-        name: createCountryDto.name
+        message: `Region ${createCountryDto.name} creada correctamente`
       }
     } catch (error) {
       await fse.unlink(image.path)
@@ -156,8 +155,7 @@ export class CountrysService {
 
     await this.CountryEntity.findByIdAndUpdate(id, updateCountryDto)
     return {
-      message: 'Region actualizada correctamente',
-      name: countryFound.name
+      message: `Region ${countryFound.name} actualizada correctamente`
     }
   }
 
@@ -174,8 +172,7 @@ export class CountrysService {
     }
     await this.CountryEntity.findByIdAndDelete(id)
     return {
-      message: 'Region eliminada correctamente',
-      name: countryFound.name
+      message: `Region ${countryFound.name} eliminada correctamente`
     }
   }
 }

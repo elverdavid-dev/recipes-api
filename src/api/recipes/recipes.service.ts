@@ -14,6 +14,7 @@ import { CreateRecipeDto } from './dto/create-recipe.dto'
 import { SearchRecipeDto } from './dto/search-recipe.dto'
 import { UpdateRecipeDto } from './dto/update-recipe.dto'
 import { Recipe } from './entities/recipe.entity'
+
 @Injectable()
 export class RecipesService {
   constructor(
@@ -112,10 +113,26 @@ export class RecipesService {
    * @returns Lista de recetas que tengan el nombre buscado
    * @throws Mensaje que indica que no hay recetas relacionadas con el nombre buscado
    */
-  async searchByName(searchRecipeDto: SearchRecipeDto) {
+  async searchByName(
+    searchRecipeDto: SearchRecipeDto,
+    page: number,
+    limit: number
+  ) {
     const query = { name: { $regex: searchRecipeDto.name, $options: 'i' } }
 
+    const totalRecipes = await this.RecipeEntity.countDocuments({
+      name: searchRecipeDto.name
+    })
+
+    const { currentPage, totalItems, totalPages, skip } = paginateResults(
+      totalRecipes,
+      page,
+      limit
+    )
+
     const recipes = await this.RecipeEntity.find(query)
+      .skip(skip)
+      .limit(limit)
       .populate('category', '-public_id')
       .populate('country', '-public_id')
       .select('-public_id')
@@ -125,7 +142,16 @@ export class RecipesService {
         message: `No se encontraron recetas que coincidan con el nombre ${searchRecipeDto.name}`
       }
     }
-    return recipes
+
+    const recipePageData = {
+      page: currentPage,
+      totalPages,
+      itemsPerPage: recipes.length,
+      totalItems,
+      data: recipes
+    }
+
+    return recipePageData
   }
 
   /**
@@ -160,7 +186,7 @@ export class RecipesService {
       .sort({ createdAt: -1 })
 
     if (recipes.length === 0) {
-      return { message: 'No hay recetas en esta categoria' }
+      return { message: 'No hay recetas en esta categoria!' }
     }
 
     const pageData = {
@@ -217,8 +243,7 @@ export class RecipesService {
       newRecipe.save()
 
       return {
-        message: 'Receta creada correctamente',
-        name: createRecipeDto.name
+        message: `Receta ${createRecipeDto.name} creada correctamente`
       }
     } catch (error) {
       console.log(error)
@@ -266,8 +291,7 @@ export class RecipesService {
     await this.RecipeEntity.findByIdAndUpdate(id, updateRecipeDto)
 
     return {
-      message: 'Receta actualizada correctamente',
-      name: updateRecipeDto.name
+      message: `Receta ${updateRecipeDto.name} actualizada correctamente`
     }
   }
 
@@ -293,8 +317,7 @@ export class RecipesService {
     await deleteImage(recipeFound.public_id)
     await this.RecipeEntity.findByIdAndDelete(id)
     return {
-      message: 'Receta eliminada correctamente',
-      name: recipeFound.name
+      message: `Receta ${recipeFound.name} eliminada correctamente`
     }
   }
 }

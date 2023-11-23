@@ -41,13 +41,14 @@ export class CountrysController {
   })
   @ApiQuery({
     name: 'page',
-    description: 'agrega la pagina que se desea ver por ejemplo la pagina 1',
+    description:
+      'agrega la pagina que se desea ver por ejemplo la pagina 1, por defecto es 1',
     required: false
   })
   @ApiQuery({
     name: 'limit',
     description:
-      'limite de regiones por pagina que se desea ver, por ejemplo 5 regiones por paginas',
+      'limite de regiones por pagina que se desea ver, por ejemplo 5 regiones por paginas, por defecto es 20',
     required: false
   })
   //Controlador
