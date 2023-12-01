@@ -55,10 +55,8 @@ export class RecipesController {
     @Query('page') page: string | number = 1,
     @Query('limit') limit: string | number = 20
   ) {
-    // Si no se pasan las consultas, se utilizan los valores por defecto que son de tipo number.
-    // En caso de que se pasen las consultas, los valores son de tipo string y se convierten a number.
-    const pageNumber = typeof page === 'string' ? parseInt(page, 10) : page
-    const limitNumber = typeof limit === 'string' ? parseInt(limit, 10) : limit
+    const pageNumber = Number(page)
+    const limitNumber = Number(limit)
 
     return this.recipesService.findAll(pageNumber, limitNumber)
   }
@@ -107,8 +105,8 @@ export class RecipesController {
   ) {
     // Si no se pasan las consultas, se utilizan los valores por defecto que son de tipo number.
     // En caso de que se pasen las consultas, los valores son de tipo string y se convierten a number.
-    const pageNumber = typeof page === 'string' ? parseInt(page, 10) : page
-    const limitNumber = typeof limit === 'string' ? parseInt(limit, 10) : limit
+    const pageNumber = Number(page)
+    const limitNumber = Number(limit)
     console.log(name)
     return this.recipesService.searchByName(name, pageNumber, limitNumber)
   }
@@ -143,10 +141,8 @@ export class RecipesController {
     @Query('page') page: string | number = 1,
     @Query('limit') limit: string | number = 20
   ) {
-    // Si no se pasan las consultas, se utilizan los valores por defecto que son de tipo number.
-    // En caso de que se pasen las consultas, los valores son de tipo string y se convierten a number.
-    const pageNumber = typeof page === 'string' ? parseInt(page, 10) : page
-    const limitNumber = typeof limit === 'string' ? parseInt(limit, 10) : limit
+    const pageNumber = Number(page)
+    const limitNumber = Number(limit)
 
     return this.recipesService.getAllRecipesOneCategory(
       categoryId,

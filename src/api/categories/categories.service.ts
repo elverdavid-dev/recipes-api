@@ -125,7 +125,7 @@ export class CategoriesService {
       await this.CategoryEntity.findByIdAndUpdate(id, updateCategoryDto)
 
       return {
-        message: `Categoria ${updateCategoryDto.name} actualizada correctamente`
+        message: `Categoria ${categoryFound.name} actualizada correctamente`
       }
     } catch (error) {
       console.log(error)
