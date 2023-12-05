@@ -200,6 +200,7 @@ export class RecipesService {
 
   async getAllRecipesOneCountry(countryId: string) {
     const recipes = await this.RecipeEntity.find({ country: countryId })
+      .sort({ createdAt: -1 })
       .select('-public_id')
       .populate('category', '-public_id')
       .populate('country', '-public_id')
@@ -283,7 +284,7 @@ export class RecipesService {
     await this.RecipeEntity.findByIdAndUpdate(id, updateRecipeDto)
 
     return {
-      message: `Receta ${updateRecipeDto.name} actualizada correctamente`
+      message: `Receta ${recipeFound.name} actualizada correctamente`
     }
   }
 
