@@ -116,6 +116,9 @@ export class RecipesController {
    */
 
   @Get(':slug')
+  @ApiOperation({
+    summary: 'Obtener una receta por el slug por ejemplo (arroz-con-pollo)'
+  })
   async findBySlug(@Param('slug') slug: string) {
     return this.recipesService.findBySlug(slug)
   }

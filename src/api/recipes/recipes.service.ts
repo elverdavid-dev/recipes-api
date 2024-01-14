@@ -1,4 +1,5 @@
 import { deleteImage, uploadImage } from '@/config/cloudinary.config'
+import { Cache } from '@nestjs/cache-manager'
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import {
@@ -8,7 +9,6 @@ import {
 } from '@utils/cache.utils'
 import { paginateResults } from '@utils/paginate.utlis'
 import { ResponseMessage } from '@utils/responseMessage'
-import { Cache } from 'cache-manager'
 import * as fse from 'fs-extra'
 import { Model } from 'mongoose'
 import slugify from 'slugify'
