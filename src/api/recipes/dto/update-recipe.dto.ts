@@ -64,6 +64,12 @@ export class UpdateRecipeDto extends PartialType(CreateRecipeDto) {
   image?: string
   @ApiProperty({
     description:
+      'Esta propiedad se agregara automaticamente al crear o actualizar una receta'
+  })
+  slug?: string
+
+  @ApiProperty({
+    description:
       'Esta propiedad se agregara automaticamente al guardarse una imagen , sirve para poder encontrar la imagen en el servicio de cloudinary y poder actualizar la imagen'
   })
   public_id?: string

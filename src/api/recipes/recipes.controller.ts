@@ -112,6 +112,15 @@ export class RecipesController {
   }
 
   /**
+   * @description Controlador de el servicio de buscar una receta por el slug
+   */
+
+  @Get(':slug')
+  async findBySlug(@Param('slug') slug: string) {
+    return this.recipesService.findBySlug(slug)
+  }
+
+  /**
    * @description Controlador de el servicio de buscar todas las recetas relacionada a una categoria.
    */
 

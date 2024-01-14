@@ -45,7 +45,8 @@
     "mongoose": "^7.6.4",
     "prettier": "^2.8.8",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "slugify": "^1.6.6"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.2.1",
