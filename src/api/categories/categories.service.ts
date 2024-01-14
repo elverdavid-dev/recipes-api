@@ -2,6 +2,7 @@ import { deleteImage, uploadImage } from '@/config/cloudinary.config'
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { deleteCacheByKey, getDataCache } from '@utils/cache.utils'
+import { ResponseMessage } from '@utils/responseMessage'
 import { Cache } from 'cache-manager'
 import * as fse from 'fs-extra'
 import { Model } from 'mongoose'
@@ -81,9 +82,9 @@ export class CategoriesService {
       newCategory.save()
       await deleteCacheByKey(this.cacheManager, this.cacheKey)
 
-      return {
-        message: `Categoria ${createCategoryDto.name} creada correctamente`
-      }
+      return ResponseMessage(
+        `Categoria ${createCategoryDto.name} creada correctamente`
+      )
     } catch (error) {
       throw new HttpException(
         'Error al crear una categoria!',
@@ -124,9 +125,9 @@ export class CategoriesService {
       //Actualizar categoria
       await this.CategoryEntity.findByIdAndUpdate(id, updateCategoryDto)
 
-      return {
-        message: `Categoria ${categoryFound.name} actualizada correctamente`
-      }
+      return ResponseMessage(
+        `Categoria ${categoryFound.name} actualizada correctamente`
+      )
     } catch (error) {
       console.log(error)
     }
@@ -149,8 +150,8 @@ export class CategoriesService {
     //Eliminar imagen de cloudinary y eliminar categoria de la DB
     await deleteImage(categoryFound.public_id)
     await this.CategoryEntity.findByIdAndDelete(id)
-    return {
-      message: `Categoria ${categoryFound.name} eliminada correctamente`
-    }
+    return ResponseMessage(
+      `Categoria ${categoryFound.name} eliminada correctamente`
+    )
   }
 }

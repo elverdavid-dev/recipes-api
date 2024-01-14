@@ -53,7 +53,7 @@ export class RecipesController {
   //Controlador
   findAll(
     @Query('page') page: string | number = 1,
-    @Query('limit') limit: string | number = 20
+    @Query('limit') limit?: string | number
   ) {
     const pageNumber = Number(page)
     const limitNumber = Number(limit)

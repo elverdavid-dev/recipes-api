@@ -7,6 +7,7 @@ import {
   getDataCache
 } from '@utils/cache.utils'
 import { paginateResults } from '@utils/paginate.utlis'
+import { ResponseMessage } from '@utils/responseMessage'
 import { Cache } from 'cache-manager'
 import * as fse from 'fs-extra'
 import { Model } from 'mongoose'
@@ -30,7 +31,7 @@ export class RecipesService {
    * @returns Lista de las recetas
    * @throws {HttpException} Si la pagina no existe o es menor o igual a 0
    */
-  async findAll(page = 1, limit = 20) {
+  async findAll(page = 1, limit?: number) {
     //Generar cacheKey
     this.cacheKey = generateCacheKey(page, limit)
 
@@ -59,7 +60,7 @@ export class RecipesService {
       .populate('country', '-public_id')
       .select('-public_id')
       .sort({ createdAt: -1 })
-
+    console.log(totalPages)
     const recipePageData = {
       page: currentPage,
       totalPages,
@@ -68,7 +69,6 @@ export class RecipesService {
       data: listRecipes
     }
     await this.cacheManager.set(this.cacheKey, recipePageData)
-
     return recipePageData
   }
 
@@ -131,9 +131,9 @@ export class RecipesService {
       .select('-public_id')
       .sort({ createdAt: -1 })
     if (recipes.length === 0) {
-      return {
-        message: `No se encontraron recetas que coincidan con el nombre ${name}`
-      }
+      return ResponseMessage(
+        `No se encontraron recetas que coincidan con el nombre ${name}`
+      )
     }
     const recipePageData = {
       page: currentPage,
@@ -178,7 +178,7 @@ export class RecipesService {
       .sort({ createdAt: -1 })
 
     if (recipes.length === 0) {
-      return { message: 'No hay recetas en esta categoria!' }
+      return ResponseMessage('No hay recetas en esta categoria!')
     }
 
     const pageData = {
@@ -206,7 +206,7 @@ export class RecipesService {
       .populate('country', '-public_id')
 
     if (recipes.length === 0) {
-      return { message: 'No hay recetas relacionadas a este pais!' }
+      return ResponseMessage('No hay recetas relacionadas a este pais!')
     }
     return recipes
   }
@@ -235,9 +235,9 @@ export class RecipesService {
       })
       newRecipe.save()
 
-      return {
-        message: `Receta ${createRecipeDto.name} creada correctamente`
-      }
+      return ResponseMessage(
+        `Receta ${createRecipeDto.name} creada correctamente`
+      )
     } catch (error) {
       console.log(error)
       await fse.unlink(image.path)
@@ -283,9 +283,9 @@ export class RecipesService {
     //receta actualizada
     await this.RecipeEntity.findByIdAndUpdate(id, updateRecipeDto)
 
-    return {
-      message: `Receta ${recipeFound.name} actualizada correctamente`
-    }
+    return ResponseMessage(
+      `Receta ${recipeFound.name} actualizada correctamente`
+    )
   }
 
   /**
@@ -309,8 +309,6 @@ export class RecipesService {
     //Eliminar receta y eliminar imagen de cloudinary
     await deleteImage(recipeFound.public_id)
     await this.RecipeEntity.findByIdAndDelete(id)
-    return {
-      message: `Receta ${recipeFound.name} eliminada correctamente`
-    }
+    return ResponseMessage(`Receta ${recipeFound.name} eliminada correctamente`)
   }
 }
