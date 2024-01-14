@@ -34,6 +34,9 @@ export class Recipe {
 
   @Prop()
   public_id: string
+
+  @Prop({ lowercase: true })
+  slug: string
 }
 
 export const RecipeEntity = SchemaFactory.createForClass(Recipe)

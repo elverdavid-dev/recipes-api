@@ -11,6 +11,7 @@ import { ResponseMessage } from '@utils/responseMessage'
 import { Cache } from 'cache-manager'
 import * as fse from 'fs-extra'
 import { Model } from 'mongoose'
+import slugify from 'slugify'
 import { CreateRecipeDto } from './dto/create-recipe.dto'
 import { UpdateRecipeDto } from './dto/update-recipe.dto'
 import { Recipe } from './entities/recipe.entity'
@@ -23,6 +24,8 @@ export class RecipesService {
   ) {}
 
   private cacheKey = ''
+
+  //! ------------------ Querys -----------------
 
   /**
    * @description Servicio para obtener todas las recetas
@@ -147,6 +150,15 @@ export class RecipesService {
   }
 
   /**
+   * @description Servicio para buscar receta por el slug
+   * @param slug - slug de la receta que desea buscar
+   * @returns recetas que tengan el slug buscado
+   */
+  async findBySlug(slug: string) {
+    return await this.RecipeEntity.findOne({ slug })
+  }
+
+  /**
    * @description Servicio para obtener o filtrar todas las recetas de una categoría específica.
    * @param categoryId - ID de la categoría por la cual deseas filtrar las recetas.
    * @returns Lista de todas las recetas asociada a esa categoria
@@ -210,6 +222,7 @@ export class RecipesService {
     }
     return recipes
   }
+  //! ------------------- Mutations ------------------------------
   /**
    * Servicio para crea una nueva receta con los detalles proporcionados y la imagen asociada.
    * @param createRecipeDto - Datos de la receta a crear.
@@ -227,11 +240,16 @@ export class RecipesService {
       //subir imagen a cloudinary y eliminarla de la carpeta upload
       const cloudinaryResponse = await uploadImage(image.path, 'recipes')
       await fse.unlink(image.path)
+      const slug = slugify(createRecipeDto.name, {
+        lower: true,
+        replacement: '-'
+      })
       //crear la receta y guardarla en la DB
       const newRecipe = new this.RecipeEntity({
         ...createRecipeDto,
         image: cloudinaryResponse.secure_url,
-        public_id: cloudinaryResponse.public_id
+        public_id: cloudinaryResponse.public_id,
+        slug
       })
       newRecipe.save()
 
