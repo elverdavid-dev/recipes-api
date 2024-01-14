@@ -7,12 +7,14 @@ import {
   getDataCache
 } from '@utils/cache.utils'
 import { paginateResults } from '@utils/paginate.utlis'
+import { ResponseMessage } from '@utils/responseMessage'
 import { Cache } from 'cache-manager'
 import * as fse from 'fs-extra'
 import { Model } from 'mongoose'
 import { CreateCountryDto } from './dto/create-country.dto'
 import { UpdateCountryDto } from './dto/update-country.dto'
 import { Country } from './entities/country.entity'
+
 @Injectable()
 export class CountrysService {
   constructor(
@@ -101,9 +103,9 @@ export class CountrysService {
         public_id: cloudinaryResponse.public_id
       })
       newCountry.save()
-      return {
-        message: `Region ${createCountryDto.name} creada correctamente`
-      }
+      return ResponseMessage(
+        `Region ${createCountryDto.name} creada correctamente`
+      )
     } catch (error) {
       await fse.unlink(image.path)
       throw new HttpException(
@@ -154,9 +156,9 @@ export class CountrysService {
     }
 
     await this.CountryEntity.findByIdAndUpdate(id, updateCountryDto)
-    return {
-      message: `Region ${countryFound.name} actualizada correctamente`
-    }
+    return ResponseMessage(
+      `Region ${countryFound.name} actualizada correctamente`
+    )
   }
 
   /**
@@ -171,8 +173,8 @@ export class CountrysService {
       throw new HttpException('La region no existe!', HttpStatus.NOT_FOUND)
     }
     await this.CountryEntity.findByIdAndDelete(id)
-    return {
-      message: `Region ${countryFound.name} eliminada correctamente`
-    }
+    return ResponseMessage(
+      `Region ${countryFound.name} eliminada correctamente`
+    )
   }
 }
