@@ -39,6 +39,19 @@ export class CategoriesController {
   }
 
   /**
+   * @description Controlador de el servicio de buscar una categoria por el slug
+   */
+
+  @Get(':slug')
+  @ApiOperation({
+    summary:
+      'Obtener una categoria por el slug por ejemplo (dulces-y-reposteria)'
+  })
+  async findBySlug(@Param('slug') slug: string) {
+    return this.categoriesService.findBySlug(slug)
+  }
+
+  /**
    * @description Controlador de el servicio de obtener una categoria por id.
    */
 

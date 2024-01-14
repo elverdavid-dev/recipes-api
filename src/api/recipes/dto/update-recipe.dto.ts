@@ -62,11 +62,6 @@ export class UpdateRecipeDto extends PartialType(CreateRecipeDto) {
       'Al actualizar una imagen debe de tener en cuenta que la nueva imagen sea de cualquiera de estos tipo png,svg,jpg,jpge,webp,avif , la url que estaba en la base de datos se actualizara y se guardara la nueva url de la nueva imagen'
   })
   image?: string
-  @ApiProperty({
-    description:
-      'Esta propiedad se agregara automaticamente al crear o actualizar una receta'
-  })
-  slug?: string
 
   @ApiProperty({
     description:

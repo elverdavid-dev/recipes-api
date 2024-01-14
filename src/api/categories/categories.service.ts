@@ -1,11 +1,12 @@
 import { deleteImage, uploadImage } from '@/config/cloudinary.config'
+import { Cache } from '@nestjs/cache-manager'
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { deleteCacheByKey, getDataCache } from '@utils/cache.utils'
 import { ResponseMessage } from '@utils/responseMessage'
-import { Cache } from 'cache-manager'
 import * as fse from 'fs-extra'
 import { Model } from 'mongoose'
+import slugify from 'slugify'
 import { CreateCategoryDto } from './dto/create-category.dto'
 import { UpdateCategoryDto } from './dto/update-category.dto'
 import { Category } from './entities/category.entity'
@@ -19,6 +20,7 @@ export class CategoriesService {
 
   private readonly cacheKey = 'categories_cache_key'
 
+  //! ---------------------Querys--------------------
   /**
    * Servicio para obtener todas las categorias
    * @returns Lista de las categorias
@@ -57,6 +59,22 @@ export class CategoriesService {
   }
 
   /**
+   * Servicio para obtener categoria por slug
+   * @param slug - slug de la categoria que se desea buscar
+   * @returns categoria especifica buscada
+   * @throws {HttpException} si la categoria no existe
+   */
+  async findBySlug(slug: string) {
+    const category = await this.CategoryEntity.findOne({ slug })
+    if (!category) {
+      throw new HttpException('La categoria no existe', HttpStatus.NOT_FOUND)
+    }
+    return category
+  }
+
+  //! ----------Mutations ---------------
+
+  /**
    * Servicio para crea una nueva categoria con los detalles proporcionados y la imagen asociada.
    * @param createRecipeDto - Datos de la categoria a crear.
    * @param image - Imagen asociada a la categoria.
@@ -73,11 +91,17 @@ export class CategoriesService {
       //subir imagen a cloudinary y eliminarla de la carpeta upload
       const cloudinaryResponse = await uploadImage(image.path, 'categories')
       await fse.unlink(image.path)
+
+      const slug = slugify(createCategoryDto.name, {
+        lower: true,
+        replacement: '-'
+      })
       //Crear la categoria y guardarla en la DB
       const newCategory = await this.CategoryEntity.create({
         ...createCategoryDto,
         image: cloudinaryResponse.secure_url,
-        public_id: cloudinaryResponse.public_id
+        public_id: cloudinaryResponse.public_id,
+        slug
       })
       newCategory.save()
       await deleteCacheByKey(this.cacheManager, this.cacheKey)
@@ -122,8 +146,16 @@ export class CategoriesService {
         updateCategoryDto.image = newImage.secure_url
         updateCategoryDto.public_id = newImage.public_id
       }
+
+      const slug = slugify(updateCategoryDto.name, {
+        lower: true,
+        replacement: '-'
+      })
       //Actualizar categoria
-      await this.CategoryEntity.findByIdAndUpdate(id, updateCategoryDto)
+      await this.CategoryEntity.findByIdAndUpdate(id, {
+        ...updateCategoryDto,
+        slug
+      })
 
       return ResponseMessage(
         `Categoria ${categoryFound.name} actualizada correctamente`

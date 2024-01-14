@@ -65,6 +65,18 @@ export class CountrysController {
   }
 
   /**
+   * @description Controlador de el servicio de buscar un pais por el slug
+   */
+
+  @Get(':slug')
+  @ApiOperation({
+    summary: 'Obtener un pais por el slug ejemplo (republica-dominicana)'
+  })
+  async findBySlug(@Param('slug') slug: string) {
+    return this.countrysService.findBySlug(slug)
+  }
+
+  /**
    * @description Controlador de el servicio de obtener una región por id.
    */
 

@@ -1,4 +1,5 @@
 import { deleteImage, uploadImage } from '@/config/cloudinary.config'
+import { Cache } from '@nestjs/cache-manager'
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import {
@@ -8,9 +9,9 @@ import {
 } from '@utils/cache.utils'
 import { paginateResults } from '@utils/paginate.utlis'
 import { ResponseMessage } from '@utils/responseMessage'
-import { Cache } from 'cache-manager'
 import * as fse from 'fs-extra'
 import { Model } from 'mongoose'
+import slugify from 'slugify'
 import { CreateCountryDto } from './dto/create-country.dto'
 import { UpdateCountryDto } from './dto/update-country.dto'
 import { Country } from './entities/country.entity'
@@ -27,6 +28,8 @@ export class CountrysService {
    * Servicio para obtener todas las regiones
    * @returns Lista de las regiones
    */
+
+  //! -----------------Querys--------------------
 
   async findAll(page: number, limit: number) {
     //Generar cacheKey
@@ -80,6 +83,22 @@ export class CountrysService {
   }
 
   /**
+   * Servicio para obtener región por slug
+   * @param slug - slug de la región que se desea buscar
+   * @returns región especifica buscada
+   * @throws {HttpException} si la región no existe
+   */
+  async findBySlug(slug: string) {
+    const country = await this.CountryEntity.findOne({ slug })
+    if (!country) {
+      throw new HttpException('La region no existe', HttpStatus.NOT_FOUND)
+    }
+    return country
+  }
+
+  //! -----------Mutations------------------
+
+  /**
    * @description servicio para crear una region relacionada a una receta
    * @param createCountryDto - datos de la nueva region
    * @param image - imagen relacionado a la region
@@ -97,10 +116,16 @@ export class CountrysService {
       const cloudinaryResponse = await uploadImage(image.path, 'countrys')
       await fse.unlink(image.path)
 
+      const slug = slugify(createCountryDto.name, {
+        lower: true,
+        replacement: '-'
+      })
+
       const newCountry = await this.CountryEntity.create({
         ...createCountryDto,
         image: cloudinaryResponse.secure_url,
-        public_id: cloudinaryResponse.public_id
+        public_id: cloudinaryResponse.public_id,
+        slug
       })
       newCountry.save()
       return ResponseMessage(
@@ -141,12 +166,6 @@ export class CountrysService {
       this.cacheKey = ''
     }
 
-    //Eliminar la cache
-    if (this.cacheKey) {
-      await deleteCacheByKey(this.cacheManager, this.cacheKey)
-      this.cacheKey = ''
-    }
-
     if (image) {
       await deleteImage(countryFound.public_id)
       const newImage = await uploadImage(image.path, 'countrys')
@@ -155,7 +174,15 @@ export class CountrysService {
       updateCountryDto.public_id = newImage.public_id
     }
 
-    await this.CountryEntity.findByIdAndUpdate(id, updateCountryDto)
+    const slug = slugify(updateCountryDto.name, {
+      lower: true,
+      replacement: '-'
+    })
+
+    await this.CountryEntity.findByIdAndUpdate(id, {
+      ...updateCountryDto,
+      slug
+    })
     return ResponseMessage(
       `Region ${countryFound.name} actualizada correctamente`
     )
