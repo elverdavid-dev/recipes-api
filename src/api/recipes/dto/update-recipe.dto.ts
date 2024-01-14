@@ -64,7 +64,7 @@ export class UpdateRecipeDto extends PartialType(CreateRecipeDto) {
   image?: string
   @ApiProperty({
     description:
-      'Esta propiedad se agregara automaticamente al crear una nueva receta'
+      'Esta propiedad se agregara automaticamente al crear o actualizar una receta'
   })
   slug?: string
 

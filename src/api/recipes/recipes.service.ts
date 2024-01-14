@@ -155,7 +155,11 @@ export class RecipesService {
    * @returns recetas que tengan el slug buscado
    */
   async findBySlug(slug: string) {
-    return await this.RecipeEntity.findOne({ slug })
+    const recipe = await this.RecipeEntity.findOne({ slug })
+    if (!recipe) {
+      throw new HttpException('La receta no existe!', HttpStatus.NOT_FOUND)
+    }
+    return recipe
   }
 
   /**
@@ -298,8 +302,12 @@ export class RecipesService {
       updateRecipeDto.image = newImage.secure_url
       updateRecipeDto.public_id = newImage.public_id
     }
+    const slug = slugify(updateRecipeDto.name, {
+      lower: true,
+      replacement: '-'
+    })
     //receta actualizada
-    await this.RecipeEntity.findByIdAndUpdate(id, updateRecipeDto)
+    await this.RecipeEntity.findByIdAndUpdate(id, { ...updateRecipeDto, slug })
 
     return ResponseMessage(
       `Receta ${recipeFound.name} actualizada correctamente`
