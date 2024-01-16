@@ -156,6 +156,9 @@ export class RecipesService {
    */
   async findBySlug(slug: string) {
     const recipe = await this.RecipeEntity.findOne({ slug })
+      .populate('category', '-public_id')
+      .populate('country', '-public_id')
+      .select('-public_id')
     if (!recipe) {
       throw new HttpException('La receta no existe!', HttpStatus.NOT_FOUND)
     }
