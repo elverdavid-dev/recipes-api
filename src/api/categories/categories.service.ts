@@ -65,7 +65,9 @@ export class CategoriesService {
    * @throws {HttpException} si la categoria no existe
    */
   async findBySlug(slug: string) {
-    const category = await this.CategoryEntity.findOne({ slug })
+    const category = await this.CategoryEntity.findOne({ slug }).select(
+      '-public_id'
+    )
     if (!category) {
       throw new HttpException('La categoria no existe', HttpStatus.NOT_FOUND)
     }
