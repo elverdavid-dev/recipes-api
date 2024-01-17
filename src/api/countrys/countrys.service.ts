@@ -89,7 +89,9 @@ export class CountrysService {
    * @throws {HttpException} si la región no existe
    */
   async findBySlug(slug: string) {
-    const country = await this.CountryEntity.findOne({ slug })
+    const country = await this.CountryEntity.findOne({ slug }).select(
+      '-public_id'
+    )
     if (!country) {
       throw new HttpException('La region no existe', HttpStatus.NOT_FOUND)
     }
