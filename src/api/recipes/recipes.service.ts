@@ -1,4 +1,4 @@
-import { deleteImage, uploadImage } from '@/config/cloudinary.config'
+
 import { Cache } from '@nestjs/cache-manager'
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
@@ -15,13 +15,15 @@ import slugify from 'slugify'
 import { CreateRecipeDto } from './dto/create-recipe.dto'
 import { UpdateRecipeDto } from './dto/update-recipe.dto'
 import { Recipe } from './entities/recipe.entity'
+import { CloudinaryService } from '@/config/cloudinary/cloudinary.service'
 
 @Injectable()
 export class RecipesService {
   constructor(
     @InjectModel(Recipe.name) private RecipeEntity: Model<Recipe>,
-    @Inject('CACHE_MANAGER') private cacheManager: Cache
-  ) {}
+    @Inject('CACHE_MANAGER') private cacheManager: Cache,
+    private readonly cloudinaryService: CloudinaryService,
+  ) { }
 
   private cacheKey = ''
 
@@ -63,7 +65,6 @@ export class RecipesService {
       .populate('country', '-public_id')
       .select('-public_id')
       .sort({ createdAt: -1 })
-    console.log(totalPages)
     const recipePageData = {
       page: currentPage,
       totalPages,
@@ -245,7 +246,8 @@ export class RecipesService {
         this.cacheKey = ''
       }
       //subir imagen a cloudinary y eliminarla de la carpeta upload
-      const cloudinaryResponse = await uploadImage(image.path, 'recipes')
+      const cloudinaryResponse = await this.cloudinaryService.uploadImage(image, 'recipes')
+
       await fse.unlink(image.path)
       const slug = slugify(createRecipeDto.name, {
         lower: true,
@@ -299,8 +301,8 @@ export class RecipesService {
     }
     //actualizar la imagen
     if (image) {
-      await deleteImage(recipeFound.public_id)
-      const newImage = await uploadImage(image.path, 'recipes')
+      await this.cloudinaryService.deleteImage(recipeFound.public_id)
+      const newImage = await this.cloudinaryService.uploadImage(image, 'recipes')
       await fse.unlink(image.path)
       updateRecipeDto.image = newImage.secure_url
       updateRecipeDto.public_id = newImage.public_id
@@ -336,7 +338,7 @@ export class RecipesService {
       this.cacheKey = ''
     }
     //Eliminar receta y eliminar imagen de cloudinary
-    await deleteImage(recipeFound.public_id)
+    await this.cloudinaryService.deleteImage(recipeFound.public_id)
     await this.RecipeEntity.findByIdAndDelete(id)
     return ResponseMessage(`Receta ${recipeFound.name} eliminada correctamente`)
   }

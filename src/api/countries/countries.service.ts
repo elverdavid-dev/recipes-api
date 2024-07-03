@@ -17,11 +17,11 @@ import { UpdateCountryDto } from './dto/update-country.dto'
 import { Country } from './entities/country.entity'
 
 @Injectable()
-export class CountrysService {
+export class CountriesService {
   constructor(
     @InjectModel(Country.name) private CountryEntity: Model<Country>,
     @Inject('CACHE_MANAGER') private cacheManager: Cache
-  ) {}
+  ) { }
 
   private cacheKey = ''
   /**

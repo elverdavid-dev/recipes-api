@@ -1,6 +1,6 @@
 //eslint-disable-next-line prettier/prettier
 import { Category } from '@/api/categories/entities/category.entity'
-import { Country } from '@/api/countrys/entities/country.entity'
+import { Country } from '@/api/countries/entities/country.entity'
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import mongoose from 'mongoose'
 @Schema({ timestamps: true, versionKey: false })
