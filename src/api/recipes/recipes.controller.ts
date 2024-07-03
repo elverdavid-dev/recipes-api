@@ -25,11 +25,12 @@ import { diskStorage } from 'multer'
 import { CreateRecipeDto } from './dto/create-recipe.dto'
 import { UpdateRecipeDto } from './dto/update-recipe.dto'
 import { RecipesService } from './recipes.service'
+import { imageUploadConfig } from '@/config/image-upload-config'
 
 @ApiTags('Recetas')
 @Controller('recipes')
 export class RecipesController {
-  constructor(private readonly recipesService: RecipesService) {}
+  constructor(private readonly recipesService: RecipesService) { }
 
   /**
    * @description Controlador de el servicio de obtener todas las recetas.
@@ -107,7 +108,6 @@ export class RecipesController {
     // En caso de que se pasen las consultas, los valores son de tipo string y se convierten a number.
     const pageNumber = Number(page)
     const limitNumber = Number(limit)
-    console.log(name)
     return this.recipesService.searchByName(name, pageNumber, limitNumber)
   }
 
@@ -194,19 +194,14 @@ export class RecipesController {
 
   @Post()
   //Subir imagen
-  @UseInterceptors(
-    FileInterceptor('image', {
-      storage: diskStorage({ destination: './upload' }),
-      fileFilter
-    })
-  )
+  @UseInterceptors(FileInterceptor('image'))
   //Documentacion
   @ApiOperation({ summary: 'Crear nueva receta' })
   @ApiConsumes('multipart/form-data')
-  @ApiExcludeEndpoint()
+  //@ApiExcludeEndpoint()
   //Controlador
   create(
-    @UploadedFile() image: Express.Multer.File,
+    @UploadedFile(imageUploadConfig) image: Express.Multer.File,
     @Body() createRecipeDto: CreateRecipeDto
   ) {
     return this.recipesService.create(createRecipeDto, image)

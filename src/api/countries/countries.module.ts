@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common'
-import { CountrysService } from './countrys.service'
-import { CountrysController } from './countrys.controller'
+import { CountriesService } from './countries.service'
+import { CountriesController } from './countries.controller'
 import { MongooseModule } from '@nestjs/mongoose'
 import { Country, CountryEntity } from './entities/country.entity'
 
@@ -8,7 +8,7 @@ import { Country, CountryEntity } from './entities/country.entity'
   imports: [
     MongooseModule.forFeature([{ name: Country.name, schema: CountryEntity }])
   ],
-  controllers: [CountrysController],
-  providers: [CountrysService]
+  controllers: [CountriesController],
+  providers: [CountriesService]
 })
-export class CountrysModule {}
+export class CountriesModule { }

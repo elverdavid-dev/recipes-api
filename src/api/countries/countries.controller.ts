@@ -21,14 +21,14 @@ import {
 } from '@nestjs/swagger'
 import { fileFilter } from '@utils/fileUpload'
 import { diskStorage } from 'multer'
-import { CountrysService } from './countrys.service'
+import { CountriesService } from './countries.service'
 import { CreateCountryDto } from './dto/create-country.dto'
 import { UpdateCountryDto } from './dto/update-country.dto'
 
-@Controller('countrys')
+@Controller('countries')
 @ApiTags('Regiones')
-export class CountrysController {
-  constructor(private readonly countrysService: CountrysService) {}
+export class CountriesController {
+  constructor(private readonly countriesService: CountriesService) { }
 
   /**
    * @description Controlador de el servicio de obtener todas las regiones.
@@ -61,7 +61,7 @@ export class CountrysController {
     const pageNumber = typeof page === 'string' ? parseInt(page, 10) : page
     const limitNumber = typeof limit === 'string' ? parseInt(limit, 10) : limit
 
-    return this.countrysService.findAll(pageNumber, limitNumber)
+    return this.countriesService.findAll(pageNumber, limitNumber)
   }
 
   /**
@@ -73,7 +73,7 @@ export class CountrysController {
     summary: 'Obtener un pais por el slug ejemplo (republica-dominicana)'
   })
   async findBySlug(@Param('slug') slug: string) {
-    return this.countrysService.findBySlug(slug)
+    return this.countriesService.findBySlug(slug)
   }
 
   /**
@@ -86,7 +86,7 @@ export class CountrysController {
   })
   @ApiParam({ name: 'id', description: 'Id de la region que se desea obtener' })
   findOne(@Param('id') id: string) {
-    return this.countrysService.findOne(id)
+    return this.countriesService.findOne(id)
   }
 
   /**
@@ -118,7 +118,7 @@ export class CountrysController {
     @UploadedFile()
     image: Express.Multer.File
   ) {
-    return this.countrysService.create(createCountryDto, image)
+    return this.countriesService.create(createCountryDto, image)
   }
 
   /**
@@ -149,7 +149,7 @@ export class CountrysController {
     @UploadedFile()
     image: Express.Multer.File
   ) {
-    return this.countrysService.update(id, updateCountryDto, image)
+    return this.countriesService.update(id, updateCountryDto, image)
   }
 
   /**
@@ -163,6 +163,6 @@ export class CountrysController {
     description: 'Id de la region que se desea eliminar'
   })
   remove(@Param('id') id: string) {
-    return this.countrysService.remove(id)
+    return this.countriesService.remove(id)
   }
 }
